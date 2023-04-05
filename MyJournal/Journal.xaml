@@ -1,0 +1,20 @@
+﻿<Window x:Class="MyJournal.Journal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MyJournal"
+        mc:Ignorable="d"
+        Title="Journal" Height="450" Width="800">
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FF817B86"/>
+                <GradientStop Color="#FFBD7EEA" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Label Content="Тут" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22" Name="info"/>
+        <Button Content="Добавить ученика" HorizontalAlignment="Left" Margin="10,343,0,0" VerticalAlignment="Top" Name="add_student" Height="40" Width="199" FontSize="22" Click="AddStudentClick"/>
+
+    </Grid>
+</Window>
