@@ -44,7 +44,7 @@ namespace MyJournal
                 }
                 connection.Close();
             }
-        }
+        }//
         public static bool CheckStudent(string login, string password)
         {
             bool userExists = false;
