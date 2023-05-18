@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyJournal
+namespace MyJournal.Class
 {
-    public class Student : User
+    internal class Group
     {
         public int GroupId { get; set; }
-        public Student(string name,string password,int groupId) : base(name, password)
+        public Group(int groupId)
         {
-            Name = name;
             GroupId = groupId;
         }
     }

@@ -1,0 +1,39 @@
+﻿<Window x:Class="MyJournal.Admin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MyJournal"
+        mc:Ignorable="d"
+        Title="Admin" Height="650" Width="600">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="C:\Users\Naves\source\repos\NavesSapnis\MyJournal\MyJournal\Resources\CustomStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="0,10,0,-10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="41*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="116*"/>
+        </Grid.RowDefinitions>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Добавить учителя" HorizontalAlignment="Left" Margin="73,314,0,0" VerticalAlignment="Top" Height="49" Width="166" Click="AddTeacher" Grid.Row="1" Grid.Column="1"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Добавить группу" HorizontalAlignment="Left" Margin="61,32,0,0" VerticalAlignment="Top" Height="49" Width="166" Click="AddGroup" Grid.Row="1" Grid.ColumnSpan="2"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Добавить ученика" HorizontalAlignment="Left" Margin="10,314,0,0" VerticalAlignment="Top" Height="49" Width="166" Click="AddStudent" Grid.Row="1" Grid.ColumnSpan="2"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Удалить учителя" HorizontalAlignment="Left" Margin="223,100,0,0" VerticalAlignment="Top" Height="49" Width="167" Click="RemoveTeacher" Grid.Row="1" Grid.Column="1"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Удалить группу" HorizontalAlignment="Left" Margin="224,32,0,0" VerticalAlignment="Top" Height="49" Width="167" Click="RemoveGroup" Grid.Row="1" Grid.Column="1"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Удалить ученика" HorizontalAlignment="Left" Margin="223,166,0,0" VerticalAlignment="Top" Height="49" Width="167" Click="RemoveStudent" Grid.Row="1" Grid.Column="1"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Добавить предмет" Margin="61,136,0,0" VerticalAlignment="Top" Height="49" Width="168" HorizontalAlignment="Left" Click="AddSubject" Grid.Row="1" Grid.ColumnSpan="2"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Удалить предмет" Margin="222,233,0,0" VerticalAlignment="Top" Height="49" Width="168" HorizontalAlignment="Left" Click="RemoveSubject" Grid.Row="1" Grid.Column="1"/>
+        <TextBox Style="{StaticResource CustomTextBoxStyle2}" GotFocus="RemoveText" LostFocus="AddText" Tag="Навание предмета" HorizontalAlignment="Left" Margin="14,191,0,0" TextWrapping="NoWrap" Text="Навание предмета" VerticalAlignment="Top" Width="262" FontSize="22" Name="subjectName" Grid.Row="1" Grid.ColumnSpan="2"/>
+        <TextBox Style="{StaticResource CustomTextBoxStyle2}" GotFocus="RemoveText" LostFocus="AddText" Tag="Номер группы" HorizontalAlignment="Left" Margin="13,86,0,0" TextWrapping="NoWrap" Text="Номер группы" VerticalAlignment="Top" Width="262" FontSize="22" Name="groupName" Grid.Row="1" Grid.ColumnSpan="2"/>
+        <TextBox Style="{StaticResource CustomTextBoxStyle2}" GotFocus="RemoveText" LostFocus="AddText" Tag="Имя" HorizontalAlignment="Left" Margin="14,375,0,0" TextWrapping="NoWrap" Text="Имя" VerticalAlignment="Top" Width="262" FontSize="22" Name="name" Grid.Row="1" Grid.ColumnSpan="2"/>
+        <TextBox Style="{StaticResource CustomTextBoxStyle2}" GotFocus="RemoveText" LostFocus="AddText" Tag="Пароль" HorizontalAlignment="Left" Margin="14,425,0,0" TextWrapping="NoWrap" Text="Пароль" VerticalAlignment="Top" Width="262" FontSize="22" Name="password" Grid.Row="1" Grid.ColumnSpan="2"/>
+        <TextBox Style="{StaticResource CustomTextBoxStyle2}" GotFocus="RemoveText" LostFocus="AddText" Tag="Группа(ы)" HorizontalAlignment="Left" Margin="14,475,0,0" TextWrapping="NoWrap" Text="Группа(ы)" VerticalAlignment="Top" Width="262" FontSize="22" Name="groups" Grid.Row="1" Grid.ColumnSpan="2"/>
+    </Grid>
+</Window>

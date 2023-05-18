@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace MyJournal
 {
@@ -23,85 +25,55 @@ namespace MyJournal
     /// </summary>
     public partial class MainWindow : Window
     {
-        private BackgroundWorker _worker;
-        public static string myName { get; set; }
-        public static string Status { get; set; }
+        public void EnterAdmin()
+        {
+            Admin admin = new Admin();
+            Close();
+            admin.Show();
+        }
+        private void Enter(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Next();
+            }
+        }
+        public void Next()
+        {
+            var name_ = name.Text;
+            var password_ = password.Text;
+            EnterAdmin();
+            //if ((name_ == "Admin" && password_ == "Admin"))
+            //{
+            //    EnterAdmin();
+            //}
+            //else
+            //{
+            //    error.Content = "Ошибка авториации";
+            //}
+        }
+        public void RemoveText(object sender, EventArgs e)
+        {
+            TextBox instance = (TextBox)sender;
+            if (instance.Text == instance.Tag.ToString())
+                instance.Text = "";
+        }
+
+        public void AddText(object sender, EventArgs e)
+        {
+            TextBox instance = (TextBox)sender;
+            if (string.IsNullOrWhiteSpace(instance.Text))
+                instance.Text = instance.Tag.ToString();
+        }
         public MainWindow()
         {
             InitializeComponent();
-            _worker = new BackgroundWorker();
-            _worker.WorkerReportsProgress = true;
-            _worker.DoWork += worker_DoWork;
-            _worker.ProgressChanged += worker_ProgressChanged;
-            _worker.RunWorkerAsync();
-        }
-        private void worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            while (true)
-            {
-                bool isChecked = (bool)teacher.Dispatcher.Invoke((Func<bool>)(() => (bool)teacher.IsChecked));
-                _worker.ReportProgress(isChecked ? 1 : 0);
-                Thread.Sleep(100);
-            }
-        }
-        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            sing_up.Visibility = e.ProgressPercentage == 1 ? Visibility.Visible : Visibility.Collapsed;
-        }
-        public void NextWindow()
-        {
-            Journal journal = new Journal();
-            Close();
-            journal.Show();
-        }
-        private void LoginClick(object sender, RoutedEventArgs e)
-        {
-            if ((bool)teacher.IsChecked)
-            {
-                if(Sql.CheckTeacher(login.Text,password.Text))
-                {
-                    myName= login.Text;
-                    Status = "Учитель";
-                    NextWindow();
-                }
-                else
-                {
-                    Message.Alert("Такого учителя нет");
-                }
-            }
-            else
-            {
-                if(Sql.CheckStudent(login.Text, password.Text))
-                {
-                    myName = login.Text;
-                    Status = "Ученик";
-                    NextWindow();
-                }
-                else
-                {
-                    Message.Alert("Такого ученика нет");
-                }
-            }
+            ResizeMode = ResizeMode.NoResize;
         }
 
-        private void SingUpClick(object sender, RoutedEventArgs e)
+        private void NextWindow(object sender, RoutedEventArgs e)
         {
-            if ((bool)teacher.IsChecked)
-            {
-                try
-                {
-                    Sql.AddTeacher(login.Text, password.Text);
-                    Message.Alert("Учитель добавлен");
-                }
-                catch
-                {
-                    Message.Alert("Такой учитель уже есть");
-                }
-            }
-            else
-            {
-                Message.Alert("Нельзя зарегистрироваться будучи учеником");
-            }
+            Next();
         }
     }
 }
