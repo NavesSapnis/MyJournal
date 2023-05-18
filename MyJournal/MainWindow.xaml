@@ -10,7 +10,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="C:\Users\Naves\source\repos\NavesSapnis\MyJournal\MyJournal\Resources\CustomStyles.xaml"/>
+                <ResourceDictionary Source="Resources\CustomStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
