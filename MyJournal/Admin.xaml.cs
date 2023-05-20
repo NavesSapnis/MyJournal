@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,6 +34,18 @@ namespace MyJournal
             if (string.IsNullOrWhiteSpace(instance.Text))
                 instance.Text = instance.Tag.ToString();
         }
+        public void tableComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                ComboBoxItem selectedItem = (ComboBoxItem)tableComboBox.SelectedItem;
+                string tableName = selectedItem.Content.ToString();
+                var dataSource = Sql.LoadDataFromTable(tableName);
+                data.ItemsSource = dataSource.DefaultView;
+            }
+            catch { }
+        }
+        
         public Admin()
         {
             InitializeComponent();
@@ -39,12 +54,27 @@ namespace MyJournal
 
         public void AddGroup(object sender, RoutedEventArgs e)
         {
-
+            var name = groupName.Text;
+            try
+            {
+                if (!string.IsNullOrEmpty(name) && name != "Номер группы")
+                {
+                    Sql.AddGroup(name);
+                    MessageBox.Show($"Группа \"{name}\" успешно добавлена!");
+                }
+                else
+                {
+                    MessageBox.Show("Необходимо ввести название группы");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Такая группа уже есть");
+            }
         }
-
         public void AddTeacher(object sender, RoutedEventArgs e)
         {
-
+            var name_ = name.Text;
         }
         public void AddStudent(object sender, RoutedEventArgs e)
         {
@@ -52,18 +82,23 @@ namespace MyJournal
         }
         public void AddSubject(object sender, RoutedEventArgs e)
         {
-            string subjectName = MessageBox.Show("Введите название предмета", "Добавить предмет", MessageBoxButton.OKCancel).ToString();
-
-
-        if (!string.IsNullOrEmpty(subjectName))
-        {
-            
-            MessageBox.Show($"Предмет \"{subjectName}\" успешно добавлен!");
-        }
-        else
-        {
-            MessageBox.Show("Необходимо ввести название предмета");
-        }
+            var name = subjectName.Text;
+            try
+            {
+                if (!string.IsNullOrEmpty(name) && name != "Название предмета")
+                {
+                    Sql.AddSubject(name);
+                    MessageBox.Show($"Предмет \"{name}\" успешно добавлен!");
+                }
+                else
+                {
+                    MessageBox.Show("Необходимо ввести название предмета");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Такой предмет уже есть");
+            }
         }
         public void RemoveGroup(object sender, RoutedEventArgs e)
         {

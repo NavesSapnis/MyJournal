@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.Windows;
 using System.Data.SqlClient;
+using System.Data;
 
 namespace MyJournal
 {
@@ -25,6 +26,36 @@ namespace MyJournal
                     command.ExecuteNonQuery();
                 }
                 connection.Close();
+            }
+        }
+        public static void AddGroup(string GroupName)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand("INSERT INTO Groups (GroupName) VALUES (@GroupName)", connection))
+                {
+                    command.Parameters.AddWithValue("@GroupName", GroupName);
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+        }
+        public static DataTable LoadDataFromTable(string name)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = $"SELECT * FROM {name}";
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+
+                SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+
+                DataTable dataSource = new DataTable();
+
+                adapter.Fill(dataSource);
+                connection.Close();
+                return dataSource;
             }
         }
         //public static void AddTeacher(string login, string password)

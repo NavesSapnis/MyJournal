@@ -108,14 +108,12 @@
     <Compile Include="Admin.xaml.cs">
       <DependentUpon>Admin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Class\Admin.cs" />
     <Compile Include="Class\Group.cs" />
     <Compile Include="Class\Mark.cs" />
     <Compile Include="Class\Student.cs" />
     <Compile Include="Class\Subject.cs" />
     <Compile Include="Class\Teacher.cs" />
     <Compile Include="Class\User.cs" />
-    <Compile Include="Message.cs" />
     <Compile Include="Sql.cs" />
     <Page Include="Admin.xaml">
       <SubType>Designer</SubType>
