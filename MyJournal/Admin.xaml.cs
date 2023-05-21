@@ -134,7 +134,7 @@ namespace MyJournal
             }
         }
         public void RemoveGroup(object sender, RoutedEventArgs e)
-        {
+        {//
             var name_ = groupName.Text;
             Sql.RemoveGroup(name_);
         }
