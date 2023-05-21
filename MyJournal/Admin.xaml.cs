@@ -1,6 +1,9 @@
-﻿using System;
+﻿using MyJournal.Class;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
@@ -45,7 +48,7 @@ namespace MyJournal
             }
             catch { }
         }
-        
+
         public Admin()
         {
             InitializeComponent();
@@ -75,9 +78,39 @@ namespace MyJournal
         public void AddTeacher(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
+            var password_ = password.Text;
+            var group_ = groups.Text;
+            try
+            {
+                if (!string.IsNullOrEmpty(name_) && (!string.IsNullOrEmpty(password_)))
+                {
+                    Sql.AddTeacher(name_, password_, group_);
+                    MessageBox.Show("Учитель добавлен");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Такой учитель уже есть");
+            }
+
         }
         public void AddStudent(object sender, RoutedEventArgs e)
         {
+            var name_ = name.Text;
+            var password_ = password.Text;
+            var group_ = groups.Text;
+            try
+            {
+                if (!string.IsNullOrEmpty(name_) && (!string.IsNullOrEmpty(password_)))
+                {
+                    Sql.AddStudent(name_, password_, group_);
+                    MessageBox.Show("Ученик добавлен");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Такой ученик уже есть");
+            }
 
         }
         public void AddSubject(object sender, RoutedEventArgs e)
@@ -102,19 +135,67 @@ namespace MyJournal
         }
         public void RemoveGroup(object sender, RoutedEventArgs e)
         {
-
+            var name_ = groupName.Text;
+            Sql.RemoveGroup(name_);
         }
         public void RemoveTeacher(object sender, RoutedEventArgs e)
         {
-
+            var name_ = name.Text;
+            Sql.RemoveTeacher(name_);
         }
         public void RemoveStudent(object sender, RoutedEventArgs e)
         {
-
+            var name_ = name.Text;
+            Sql.RemoveStudent(name_);
         }
         public void RemoveSubject(object sender, RoutedEventArgs e)
         {
+            var name_ = subjectName.Text;
+            Sql.RemoveSubject(name_);
+        }
+        public void Save(object sender, RoutedEventArgs e)
+        {
 
+            if (isEditing)
+            {
+                MessageBox.Show("У вас были изменения");
+                var newTable = GetDataTableFromDataGrid();
+                Sql.InsertDataTable("Subjects",newTable);
+            }
+            else
+            {
+                MessageBox.Show("У вас не было изменений");
+            }
+        }
+        public bool isEditing = false;
+        public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            isEditing = true;
+        }
+        public DataTable GetDataTableFromDataGrid()
+        {
+            // Создаем новый DataTable
+            DataTable dataTable = new DataTable();
+
+            // Получение столбцов из DataGrid
+            foreach (DataGridColumn column in data.Columns)
+            {
+                dataTable.Columns.Add(column.Header.ToString());
+            }
+
+            // Получение строк из DataGrid
+            foreach (DataRowView rowView in data.Items)
+            {
+                DataRow row = dataTable.NewRow();
+                foreach (DataGridColumn column in data.Columns)
+                {
+                    string columnName = column.Header.ToString();
+                    row[columnName] = rowView[columnName];
+                }
+                dataTable.Rows.Add(row);
+            }
+
+            return dataTable;
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyJournal.Class
 {
-    internal class Subject
+    public class Subject
     {
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }

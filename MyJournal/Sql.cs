@@ -7,6 +7,10 @@ using System.Data.SQLite;
 using System.Windows;
 using System.Data.SqlClient;
 using System.Data;
+using System.Xml.Linq;
+using System.Windows.Markup;
+using MyJournal.Class;
+using System.Windows.Controls;
 
 namespace MyJournal
 {
@@ -28,6 +32,27 @@ namespace MyJournal
                 connection.Close();
             }
         }
+        public static void RemoveSubject(string SubjectName)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand($"DELETE FROM Subjects WHERE SubjectName = '{SubjectName}'", connection))
+                {
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show($"Предмет успешно удален.");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Предмет не найден.");
+                    }
+                }
+                connection.Close();
+            }
+        }
         public static void AddGroup(string GroupName)
         {
             using (var connection = new SQLiteConnection(connectionString))
@@ -37,6 +62,27 @@ namespace MyJournal
                 {
                     command.Parameters.AddWithValue("@GroupName", GroupName);
                     command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+        }
+        public static void RemoveGroup(string GroupName)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand($"DELETE FROM Groups WHERE GroupName = '{GroupName}'", connection))
+                {
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show($"Группа успешно удалена.");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Группа не найдена.");
+                    }
                 }
                 connection.Close();
             }
@@ -58,79 +104,126 @@ namespace MyJournal
                 return dataSource;
             }
         }
-        //public static void AddTeacher(string login, string password)
-        //{
-        //    using (var connection = new SQLiteConnection(connectionString))
-        //    {
-        //        connection.Open();
-        //        using (var command = new SQLiteCommand("INSERT INTO Teachers (Login, Password) VALUES (@Login, @Password)", connection))
-        //        {
-        //            command.Parameters.AddWithValue("@Login", login);
-        //            command.Parameters.AddWithValue("@Password", password);
-        //            command.ExecuteNonQuery();
-        //        }
-        //        connection.Close();
-        //    }
-        //}
-        //public static bool CheckStudent(string login, string password)
-        //{
-        //    bool userExists = false;
-        //    using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-        //    {
-        //        connection.Open();
+        public static void InsertDataTable(string name,DataTable dataTable)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
 
-        //        string query = "SELECT COUNT(*) FROM Students WHERE Login=@Login AND Password=@Password";
-        //        using (SQLiteCommand command = new SQLiteCommand(query, connection))
-        //        {
-        //            command.Parameters.AddWithValue("@Login", login);
-        //            command.Parameters.AddWithValue("@Password", password);
+                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connection))
+                {
+                    bulkCopy.DestinationTableName = $"{name}";
 
-        //            int count = Convert.ToInt32(command.ExecuteScalar());
-        //            if (count > 0)
-        //            {
-        //                userExists = true;
-        //            }
-        //        }
-        //        connection.Close();
-        //    }
-        //    return userExists;
-        //}
-        //public static bool CheckTeacher(string login, string password)
-        //{
-        //    bool userExists = false;
-        //    using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-        //    {
-        //        connection.Open();
+                    for (int i = 0; i < dataTable.Columns.Count; i++)
+                    {
+                        bulkCopy.ColumnMappings.Add(dataTable.Columns[i].ColumnName, dataTable.Columns[i].ColumnName);
+                    }
+                    bulkCopy.WriteToServer(dataTable);
+                }
+            }
+        }
+        public static int GetIdGroupByName(string groupName)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
 
-        //        string query = "SELECT COUNT(*) FROM Teachers WHERE Login=@Login AND Password=@Password";
-        //        using (SQLiteCommand command = new SQLiteCommand(query, connection))
-        //        {
-        //            command.Parameters.AddWithValue("@Login", login);
-        //            command.Parameters.AddWithValue("@Password", password);
+                string selectQuery = $"SELECT GroupId FROM Groups WHERE GroupName = '{groupName}';";
 
-        //            int count = Convert.ToInt32(command.ExecuteScalar());
-        //            if (count > 0)
-        //            {
-        //                userExists = true;
-        //            }
-        //        }
-        //        connection.Close();
-        //    }
-        //    return userExists;
-        //}
-        //public static void AddGroup(string name,string group)
-        //{
-        //    using (var connection = new SQLiteConnection(connectionString))
-        //    {
-        //        connection.Open();
-        //        using (var command = new SQLiteCommand("INSERT INTO Teachers (Login) VALUES (@Login))", connection))
-        //        {
-        //            command.CommandText = "INSERT INTO Teachers WHERE Login = @Login";
-        //            command.Parameters.AddWithValue("@Groups", group);
-        //            command.ExecuteNonQuery();
-        //        }
-        //        connection.Close();
-        //    }
-        //}
+                using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
+                {
+                    object result = command.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        int groupId = Convert.ToInt32(result);
+                        return groupId;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Группа с названием '{groupName}' не найдена, добавьте ее.");
+                        return 0;
+                    }
+                    
+                }
+            }
+        }
+        public static void AddTeacher(string Name, string Password, string GroupName)
+        {
+            var MainGroup = GetIdGroupByName(GroupName);
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand("INSERT INTO Teachers (Name, Password, MainGroup) VALUES (@Name, @Password, @MainGroup)", connection))
+                {
+                    command.Parameters.AddWithValue("@Name", Name);
+                    command.Parameters.AddWithValue("@Password", Password);
+                    command.Parameters.AddWithValue("@MainGroup", MainGroup);
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+        }
+        
+        public static void RemoveTeacher(string Name)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand($"DELETE FROM Teachers WHERE Name = '{Name}';", connection))
+                {
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show($"Учитель успешно удален.");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Учитель не найден.");
+                    }
+                }
+                connection.Close();
+            }
+        }
+        public static void AddStudent(string Name, string Password, string MainGroup)
+        {
+            var GroupId = GetIdGroupByName(MainGroup);
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand("INSERT INTO Students (Name, Password, GroupId) VALUES (@Name, @Password, @GroupId)", connection))
+                {
+                    command.Parameters.AddWithValue("@Name", Name);
+                    command.Parameters.AddWithValue("@Password", Password);
+                    command.Parameters.AddWithValue("@GroupId", GroupId);
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+        }
+        public static void RemoveStudent(string Name)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand($"DELETE FROM Students WHERE Name = '{Name}'", connection))
+                {
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show($"Ученик успешно удален.");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Ученик не найден.");
+                    }
+                }
+                connection.Close();
+            }
+        }
+        
+
     }
 }

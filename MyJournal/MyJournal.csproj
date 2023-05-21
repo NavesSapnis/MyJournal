@@ -113,6 +113,7 @@
     <Compile Include="Class\Student.cs" />
     <Compile Include="Class\Subject.cs" />
     <Compile Include="Class\Teacher.cs" />
+    <Compile Include="Class\TeachersGroups.cs" />
     <Compile Include="Class\User.cs" />
     <Compile Include="Sql.cs" />
     <Page Include="Admin.xaml">
