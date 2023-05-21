@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.SqlClient;
 using System.Data.SQLite;
@@ -25,6 +26,7 @@ namespace MyJournal
     /// </summary>
     public partial class Admin : Window
     {
+        public string tableName { get; set; }
         public void RemoveText(object sender, EventArgs e)
         {
             TextBox instance = (TextBox)sender;
@@ -37,14 +39,18 @@ namespace MyJournal
             if (string.IsNullOrWhiteSpace(instance.Text))
                 instance.Text = instance.Tag.ToString();
         }
+        public void RefreshTable()
+        {
+            var dataSource = Sql.LoadDataFromTable(tableName);
+            data.ItemsSource = dataSource.DefaultView;
+        }
         public void tableComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
                 ComboBoxItem selectedItem = (ComboBoxItem)tableComboBox.SelectedItem;
-                string tableName = selectedItem.Content.ToString();
-                var dataSource = Sql.LoadDataFromTable(tableName);
-                data.ItemsSource = dataSource.DefaultView;
+                tableName = selectedItem.Content.ToString();
+                RefreshTable();
             }
             catch { }
         }
@@ -74,6 +80,7 @@ namespace MyJournal
             {
                 MessageBox.Show("Такая группа уже есть");
             }
+            RefreshTable();
         }
         public void AddTeacher(object sender, RoutedEventArgs e)
         {
@@ -92,7 +99,7 @@ namespace MyJournal
             {
                 MessageBox.Show("Такой учитель уже есть");
             }
-
+            RefreshTable();
         }
         public void AddStudent(object sender, RoutedEventArgs e)
         {
@@ -111,7 +118,7 @@ namespace MyJournal
             {
                 MessageBox.Show("Такой ученик уже есть");
             }
-
+            RefreshTable();
         }
         public void AddSubject(object sender, RoutedEventArgs e)
         {
@@ -132,69 +139,99 @@ namespace MyJournal
             {
                 MessageBox.Show("Такой предмет уже есть");
             }
+            RefreshTable();
         }
         public void RemoveGroup(object sender, RoutedEventArgs e)
-        {//
+        {
             var name_ = groupName.Text;
             Sql.RemoveGroup(name_);
+            RefreshTable();
         }
         public void RemoveTeacher(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
             Sql.RemoveTeacher(name_);
+            RefreshTable();
         }
         public void RemoveStudent(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
             Sql.RemoveStudent(name_);
+            RefreshTable();
         }
         public void RemoveSubject(object sender, RoutedEventArgs e)
         {
             var name_ = subjectName.Text;
             Sql.RemoveSubject(name_);
+            RefreshTable();
         }
         public void Save(object sender, RoutedEventArgs e)
         {
 
             if (isEditing)
             {
-                MessageBox.Show("У вас были изменения");
-                var newTable = GetDataTableFromDataGrid();
-                Sql.InsertDataTable("Subjects",newTable);
+                var table = GetDataTableFromDataGrid();
+                
+                Sql.SaveSubjects(table);
+                MessageBox.Show("Успешно добавлено");
             }
             else
             {
-                MessageBox.Show("У вас не было изменений");
+                MessageBox.Show("Изменений не было");
             }
+            RefreshTable();
         }
         public bool isEditing = false;
         public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             isEditing = true;
         }
+        public void RemoveEmptyRows(DataTable dataTable)
+        {
+            for (int i = dataTable.Rows.Count - 1; i >= 0; i--)
+            {
+                DataRow row = dataTable.Rows[i];
+
+                bool isEmpty = true;
+                foreach (var item in row.ItemArray)
+                {
+                    if (!string.IsNullOrEmpty(item?.ToString()))
+                    {
+                        isEmpty = false;
+                        break;
+                    }
+                }
+
+                if (isEmpty)
+                {
+                    dataTable.Rows.Remove(row);
+                }
+            }
+        }
         public DataTable GetDataTableFromDataGrid()
         {
-            // Создаем новый DataTable
-            DataTable dataTable = new DataTable();
 
-            // Получение столбцов из DataGrid
+            DataTable dataTable = new DataTable();
             foreach (DataGridColumn column in data.Columns)
             {
                 dataTable.Columns.Add(column.Header.ToString());
             }
 
-            // Получение строк из DataGrid
-            foreach (DataRowView rowView in data.Items)
+            foreach (var item in data.Items)
             {
-                DataRow row = dataTable.NewRow();
+                DataRow newRow = dataTable.NewRow();
+                
                 foreach (DataGridColumn column in data.Columns)
                 {
-                    string columnName = column.Header.ToString();
-                    row[columnName] = rowView[columnName];
+                    TextBlock textBlock = column.GetCellContent(item) as TextBlock;
+                    if (textBlock != null)
+                    {
+                        newRow[column.Header.ToString()] = textBlock.Text;
+                    }
                 }
-                dataTable.Rows.Add(row);
+                dataTable.Rows.Add(newRow);
             }
-
+            RemoveEmptyRows(dataTable);
             return dataTable;
         }
     }

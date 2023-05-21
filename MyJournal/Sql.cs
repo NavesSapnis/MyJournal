@@ -104,24 +104,45 @@ namespace MyJournal
                 return dataSource;
             }
         }
-        public static void InsertDataTable(string name,DataTable dataTable)
+        public static void DeleteAll(string table)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
-                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connection))
-                {
-                    bulkCopy.DestinationTableName = $"{name}";
+                string query = $"DELETE FROM {table}";
 
-                    for (int i = 0; i < dataTable.Columns.Count; i++)
-                    {
-                        bulkCopy.ColumnMappings.Add(dataTable.Columns[i].ColumnName, dataTable.Columns[i].ColumnName);
-                    }
-                    bulkCopy.WriteToServer(dataTable);
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.ExecuteNonQuery();
                 }
             }
         }
+        public static void SaveSubjects(DataTable dataTable)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                // Создание команды для вставки данных
+                string insertQuery = $"INSERT INTO Subjects (SubjectName) VALUES (@SubjectName)";
+                using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
+                {
+                    command.Parameters.Add("@SubjectName", DbType.String);
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        try
+                        {
+                            command.Parameters["@SubjectName"].Value = row["SubjectName"];
+                            command.ExecuteNonQuery();
+                        }
+                        catch { }
+                    }
+                }
+            }
+        }
+
         public static int GetIdGroupByName(string groupName)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
