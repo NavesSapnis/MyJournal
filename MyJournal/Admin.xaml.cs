@@ -27,6 +27,14 @@ namespace MyJournal
     public partial class Admin : Window
     {
         public string tableName { get; set; }
+        public void ClearSubjectName(){subjectName.Text = subjectName.Tag.ToString();}
+        public void ClearGroupName(){groupName.Text = groupName.Tag.ToString();}
+        public void ClearUserInfo() 
+        { 
+            name.Text = name.Tag.ToString();
+            password.Text = password.Tag.ToString();
+            groups.Text = groups.Tag.ToString();
+        }
         public void RemoveText(object sender, EventArgs e)
         {
             TextBox instance = (TextBox)sender;
@@ -80,6 +88,7 @@ namespace MyJournal
             {
                 MessageBox.Show("Такая группа уже есть");
             }
+            ClearGroupName();
             RefreshTable();
         }
         public void AddTeacher(object sender, RoutedEventArgs e)
@@ -99,6 +108,7 @@ namespace MyJournal
             {
                 MessageBox.Show("Такой учитель уже есть");
             }
+            ClearUserInfo();
             RefreshTable();
         }
         public void AddStudent(object sender, RoutedEventArgs e)
@@ -118,6 +128,7 @@ namespace MyJournal
             {
                 MessageBox.Show("Такой ученик уже есть");
             }
+            ClearUserInfo();
             RefreshTable();
         }
         public void AddSubject(object sender, RoutedEventArgs e)
@@ -139,40 +150,53 @@ namespace MyJournal
             {
                 MessageBox.Show("Такой предмет уже есть");
             }
+            ClearSubjectName();
             RefreshTable();
         }
         public void RemoveGroup(object sender, RoutedEventArgs e)
         {
             var name_ = groupName.Text;
             Sql.RemoveGroup(name_);
+            ClearGroupName();
             RefreshTable();
         }
         public void RemoveTeacher(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
             Sql.RemoveTeacher(name_);
+            ClearUserInfo();
             RefreshTable();
         }
         public void RemoveStudent(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
             Sql.RemoveStudent(name_);
+            ClearUserInfo();
             RefreshTable();
         }
         public void RemoveSubject(object sender, RoutedEventArgs e)
         {
             var name_ = subjectName.Text;
             Sql.RemoveSubject(name_);
+            ClearSubjectName();
             RefreshTable();
         }
         public void Save(object sender, RoutedEventArgs e)
         {
-
+            
             if (isEditing)
             {
                 var table = GetDataTableFromDataGrid();
+                switch (tableName)
+                {
+                    case "Teachers":
+                        Sql.SaveTeachers(table);
+                        break;
+                    case "Subjects":
+                        Sql.SaveSubjects(table);
+                        break;
+                }
                 
-                Sql.SaveSubjects(table);
                 MessageBox.Show("Успешно добавлено");
             }
             else

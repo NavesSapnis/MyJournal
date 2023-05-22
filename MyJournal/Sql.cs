@@ -142,6 +142,34 @@ namespace MyJournal
                 }
             }
         }
+        public static void SaveTeachers(DataTable dataTable)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                // Создание команды для вставки данных
+                string insertQuery = $"INSERT INTO Teachers (Name, Password, MainGroup) VALUES (@Name, @Password, @MainGroup)";
+                using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
+                {
+                    command.Parameters.Add("@Name", DbType.String);
+                    command.Parameters.Add("@Password", DbType.String);
+                    command.Parameters.Add("@MainGroup", DbType.Int32);
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        try
+                        {
+                            command.Parameters["@Name"].Value = row["Name"];
+                            command.Parameters["@Password"].Value = row["Password"];
+                            command.Parameters["@MainGroup"].Value = row["MainGroup"];
+                            command.ExecuteNonQuery();
+                        }
+                        catch { }
+                    }
+                }
+            }
+        }
 
         public static int GetIdGroupByName(string groupName)
         {
