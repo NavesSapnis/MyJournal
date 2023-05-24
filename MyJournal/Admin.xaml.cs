@@ -27,6 +27,7 @@ namespace MyJournal
     public partial class Admin : Window
     {
         public string tableName { get; set; }
+        public bool isEditing = false;
         public void ClearSubjectName(){subjectName.Text = subjectName.Tag.ToString();}
         public void ClearGroupName(){groupName.Text = groupName.Tag.ToString();}
         public void ClearUserInfo() 
@@ -66,6 +67,7 @@ namespace MyJournal
         public Admin()
         {
             InitializeComponent();
+            LoadData();
             ResizeMode = ResizeMode.NoResize;
         }
 
@@ -186,38 +188,17 @@ namespace MyJournal
             
             if (isEditing)
             {
-                var table = GetDataTableFromDataGrid();
-                switch (tableName)
+                try
                 {
-                    case "Groups":
-
-                        break;
-                    case "GroupSubject":
-
-                        break;
-                    case "Students":
-
-                        break; 
-                    case "Subjects":
-                        Sql.SaveSubjects(table);
-                        break;
-                    case "Teachers":
-                        Sql.SaveTeachers(table);
-                        break;
-                    case "TeachersGroups":
-
-                        break;
+                    var table = GetDataTableFromDataGrid();
+                    Sql.Save(table, tableName);
+                    RefreshTable();
                 }
-                
-                MessageBox.Show("Успешно добавлено");
+                catch { MessageBox.Show("Ошибка при сохранении"); }
+
             }
-            else
-            {
-                MessageBox.Show("Изменений не было");
-            }
-            RefreshTable();
+            
         }
-        public bool isEditing = false;
         public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             isEditing = true;
@@ -237,7 +218,7 @@ namespace MyJournal
                         break;
                     }
                 }
-
+                //TODO Попробовать проходиться вот так
                 if (isEmpty)
                 {
                     dataTable.Rows.Remove(row);
@@ -269,6 +250,62 @@ namespace MyJournal
             }
             RemoveEmptyRows(dataTable);
             return dataTable;
+            //Рабочие костыли ура
+        }
+        public void ClearComboBoxes()
+        {
+            SelectSubject.Items.Clear();
+            SelectTeacher.Items.Clear();
+            SelectGroup.Items.Clear();
+            SelectGroupTeacher.Items.Clear ();
+        }
+        public void LoadData() 
+        {
+            ClearComboBoxes();
+            
+            var subjects = Sql.LoadDataFromTable("Subjects");
+            SelectSubject.DisplayMemberPath = "SubjectName";
+            SelectSubject.SelectedValuePath = "SubjectId";
+            SelectSubject.ItemsSource = subjects.DefaultView;
+            
+
+            var teachers = Sql.LoadDataFromTable("Teachers");
+            SelectTeacher.DisplayMemberPath = "Name";
+            SelectTeacher.SelectedValuePath = "Id";
+            SelectTeacher.ItemsSource = teachers.DefaultView;
+
+            var groups = Sql.LoadDataFromTable("Groups");
+            SelectGroup.DisplayMemberPath = "GroupName"; SelectGroupTeacher.DisplayMemberPath = "GroupName";
+            SelectGroup.SelectedValuePath = "GroupId";SelectGroupTeacher.SelectedValuePath = "GroupId";
+            SelectGroup.ItemsSource = groups.DefaultView; SelectGroupTeacher.ItemsSource = groups.DefaultView;
+
+            SelectSubject.SelectedIndex = 0;SelectTeacher.SelectedIndex = 0;SelectGroup.SelectedIndex = 0; SelectGroupTeacher.SelectedIndex = 0;
+        }
+        public void AddGroups(object sender, RoutedEventArgs e)
+        {
+            Sql.AddGroupSubject(SelectSubject.SelectedValue.ToString()),SelectGroup.SelectedValue.ToString());
+        }
+        public void RemoveGroups(object sender, RoutedEventArgs e)
+        {
+            Sql.RemoveGroupSubject(int.Parse((string)SelectSubject.SelectedValue), int.Parse((string)SelectGroup.SelectedValue.ToString()));
+        }
+        private void AddGroupsTeacher(object sender, RoutedEventArgs e)
+        {
+            Sql.AddTeachersGroups(int.Parse((string)SelectTeacher.SelectedValue), int.Parse((string)SelectGroupTeacher.SelectedValue.ToString()));
+        }
+        private void RemoveGroupsTeacher(object sender, RoutedEventArgs e)
+        {
+            Sql.RemoveTeachersGroups(int.Parse((string)SelectTeacher.SelectedValue), int.Parse((string)SelectGroupTeacher.SelectedValue.ToString()));
+        }
+        public void DeleteTable(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Sql.DeleteAll(tableName);
+                MessageBox.Show($"Данные из таблицы {tableName} удалены");
+                RefreshTable();
+            }
+            catch { }
         }
     }
 }

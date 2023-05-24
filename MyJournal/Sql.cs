@@ -87,116 +87,6 @@ namespace MyJournal
                 connection.Close();
             }
         }
-        public static DataTable LoadDataFromTable(string name)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-                string query = $"SELECT * FROM {name}";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
-
-                DataTable dataSource = new DataTable();
-
-                adapter.Fill(dataSource);
-                connection.Close();
-                return dataSource;
-            }
-        }
-        public static void DeleteAll(string table)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                string query = $"DELETE FROM {table}";
-
-                using (SQLiteCommand command = new SQLiteCommand(query, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-        public static void SaveSubjects(DataTable dataTable)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                // Создание команды для вставки данных
-                string insertQuery = $"INSERT INTO Subjects (SubjectName) VALUES (@SubjectName)";
-                using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
-                {
-                    command.Parameters.Add("@SubjectName", DbType.String);
-
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        try
-                        {
-                            command.Parameters["@SubjectName"].Value = row["SubjectName"];
-                            command.ExecuteNonQuery();
-                        }
-                        catch { }
-                    }
-                }
-            }
-        }
-        public static void SaveTeachers(DataTable dataTable)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                // Создание команды для вставки данных
-                string insertQuery = $"INSERT INTO Teachers (Name, Password, MainGroup) VALUES (@Name, @Password, @MainGroup)";
-                using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
-                {
-                    command.Parameters.Add("@Name", DbType.String);
-                    command.Parameters.Add("@Password", DbType.String);
-                    command.Parameters.Add("@MainGroup", DbType.Int32);
-
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        try
-                        {
-                            command.Parameters["@Name"].Value = row["Name"];
-                            command.Parameters["@Password"].Value = row["Password"];
-                            command.Parameters["@MainGroup"].Value = row["MainGroup"];
-                            command.ExecuteNonQuery();
-                        }
-                        catch { }
-                    }
-                }
-            }
-        }
-
-        public static int GetIdGroupByName(string groupName)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                string selectQuery = $"SELECT GroupId FROM Groups WHERE GroupName = '{groupName}';";
-
-                using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
-                {
-                    object result = command.ExecuteScalar();
-
-                    if (result != null)
-                    {
-                        int groupId = Convert.ToInt32(result);
-                        return groupId;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Группа с названием '{groupName}' не найдена, добавьте ее.");
-                        return 0;
-                    }
-                    
-                }
-            }
-        }
         public static void AddTeacher(string Name, string Password, string GroupName)
         {
             var MainGroup = GetIdGroupByName(GroupName);
@@ -213,7 +103,6 @@ namespace MyJournal
                 connection.Close();
             }
         }
-        
         public static void RemoveTeacher(string Name)
         {
             using (var connection = new SQLiteConnection(connectionString))
@@ -272,7 +161,258 @@ namespace MyJournal
                 connection.Close();
             }
         }
-        
+        public static void AddGroupSubject(int SubjectId,int GroupId)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand("INSERT INTO GroupSubject (SubjectId, GroupId) VALUES (@SubjectId, @GroupId)", connection))
+                {
+                    command.Parameters.AddWithValue("@SubjectId", SubjectId);
+                    command.Parameters.AddWithValue("@GroupId", GroupId);
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+        }
+        public static void RemoveGroupSubject(int SubjectId, int GroupId)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand($"DELETE FROM GroupSubject WHERE SubjectId = {SubjectId} AND GroupId = {GroupId}", connection))
+                {
+                    int rowsAffected = command.ExecuteNonQuery();
 
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show($"Предмет у группы успешно удален.");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Удаление не успешно");
+                    }
+                }
+                connection.Close();
+            }
+        }
+        public static void AddTeachersGroups(int TeacherId, int GroupId)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand("INSERT INTO TeachersGroups (TeacherId, GroupId) VALUES (@TeacherId, @GroupId)", connection))
+                {
+                    command.Parameters.AddWithValue("@TeacherId", TeacherId);
+                    command.Parameters.AddWithValue("@GroupId", GroupId);
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+        }
+        public static void RemoveTeachersGroups(int TeacherId, int GroupId)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand($"DELETE FROM TeachersGroups WHERE TeacherId = {TeacherId} AND GroupId = {GroupId}", connection))
+                {
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show($"Группа у учителя успешна удалена.");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Удаление не успешно");
+                    }
+                }
+                connection.Close();
+            }
+        }
+        public static void Save(DataTable dataTable,string table)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string insertQuery = "";
+                switch (table)
+                {
+                    case "Groups":
+                        insertQuery = $"INSERT INTO Groups (GroupName) VALUES (@GroupName)";
+                        using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
+                        {
+                            command.Parameters.Add("@GroupName", DbType.String);
+
+                            foreach (DataRow row in dataTable.Rows)
+                            {
+                                try
+                                {
+                                    command.Parameters["@GroupName"].Value = row["GroupName"];
+                                    command.ExecuteNonQuery();
+                                }
+                                catch { }
+                            }
+                        }
+                        break;
+                    case "GroupSubject":
+                        insertQuery = $"INSERT INTO GroupSubject (SubjectId, GroupId) VALUES (@SubjectId, @GroupId)";
+                        using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
+                        {
+                            command.Parameters.Add("@SubjectId", DbType.Int32);
+                            command.Parameters.Add("@GroupId", DbType.Int32);
+
+                            foreach (DataRow row in dataTable.Rows)
+                            {
+                                try
+                                {
+                                    command.Parameters["@SubjectId"].Value = row["SubjectId"];
+                                    command.Parameters["@GroupId"].Value = row["GroupId"];
+                                    command.ExecuteNonQuery();
+                                }
+                                catch { }
+                            }
+                        }
+                        break;
+                    case "Students":
+                        insertQuery = $"INSERT INTO Students (Name, Password, GroupId) VALUES (@Name, @Password, @GroupId)";
+                        using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
+                        {
+                            command.Parameters.Add("@Name", DbType.String);
+                            command.Parameters.Add("@Password", DbType.String);
+                            command.Parameters.Add("@GroupId", DbType.Int32);
+
+                            foreach (DataRow row in dataTable.Rows)
+                            {
+                                try
+                                {
+                                    command.Parameters["@Name"].Value = row["Name"];
+                                    command.Parameters["@Password"].Value = row["Password"];
+                                    command.Parameters["@GroupId"].Value = row["GroupId"];
+                                    command.ExecuteNonQuery();
+                                }
+                                catch { }
+                            }
+                        }
+                        break;
+                    case "Subjects":
+                        insertQuery = $"INSERT INTO Subjects (SubjectName) VALUES (@SubjectName)";
+                        using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
+                        {
+                            command.Parameters.Add("@SubjectName", DbType.String);
+
+                            foreach (DataRow row in dataTable.Rows)
+                            {
+                                try
+                                {
+                                    command.Parameters["@SubjectName"].Value = row["SubjectName"];
+                                    command.ExecuteNonQuery();
+                                }
+                                catch { }
+                            }
+                        }
+                        break;
+                    case "Teachers":
+                        insertQuery = $"INSERT INTO Teachers (Name, Password, MainGroup) VALUES (@Name, @Password, @MainGroup)";
+                        using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
+                        {
+                            command.Parameters.Add("@Name", DbType.String);
+                            command.Parameters.Add("@Password", DbType.String);
+                            command.Parameters.Add("@MainGroup", DbType.Int32);
+
+                            foreach (DataRow row in dataTable.Rows)
+                            {
+                                try
+                                {
+                                    command.Parameters["@Name"].Value = row["Name"];
+                                    command.Parameters["@Password"].Value = row["Password"];
+                                    command.Parameters["@MainGroup"].Value = row["MainGroup"];
+                                    command.ExecuteNonQuery();
+                                }
+                                catch { }
+                            }
+                        }
+                        break;
+                    case "TeachersGroups":
+                        insertQuery = $"INSERT INTO TeachersGroups (TeacherId, GroupId) VALUES (@TeacherId, @GroupId)";
+                        using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
+                        {
+                            command.Parameters.Add("@TeacherId", DbType.Int32);
+                            command.Parameters.Add("@GroupId", DbType.Int32);
+
+                            foreach (DataRow row in dataTable.Rows)
+                            {
+                                try
+                                {
+                                    command.Parameters["@TeacherId"].Value = row["TeacherId"];
+                                    command.Parameters["@GroupId"].Value = row["GroupId"];
+                                    command.ExecuteNonQuery();
+                                }
+                                catch { }
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+        public static DataTable LoadDataFromTable(string name)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = $"SELECT * FROM {name}";
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+
+                SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+
+                DataTable dataSource = new DataTable();
+
+                adapter.Fill(dataSource);
+                connection.Close();
+                return dataSource;
+            }
+        }
+        public static void DeleteAll(string table)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                string query = $"DELETE FROM {table}";
+
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+        public static int GetIdGroupByName(string groupName)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                string selectQuery = $"SELECT GroupId FROM Groups WHERE GroupName = '{groupName}';";
+
+                using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
+                {
+                    object result = command.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        int groupId = Convert.ToInt32(result);
+                        return groupId;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Группа с названием '{groupName}' не найдена, добавьте ее.");
+                        return 0;
+                    }
+                    
+                }
+            }
+        }
+        
     }
 }
