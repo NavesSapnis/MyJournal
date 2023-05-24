@@ -40,7 +40,6 @@
             <ComboBoxItem Content="Выбери таблицу" />
             <ComboBoxItem Content="Groups" />
             <ComboBoxItem Content="GroupSubject" />
-            <ComboBoxItem Content="Marks" />
             <ComboBoxItem Content="Students" />
             <ComboBoxItem Content="Subjects" />
             <ComboBoxItem Content="Teachers" />

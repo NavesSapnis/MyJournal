@@ -189,11 +189,23 @@ namespace MyJournal
                 var table = GetDataTableFromDataGrid();
                 switch (tableName)
                 {
+                    case "Groups":
+
+                        break;
+                    case "GroupSubject":
+
+                        break;
+                    case "Students":
+
+                        break; 
+                    case "Subjects":
+                        Sql.SaveSubjects(table);
+                        break;
                     case "Teachers":
                         Sql.SaveTeachers(table);
                         break;
-                    case "Subjects":
-                        Sql.SaveSubjects(table);
+                    case "TeachersGroups":
+
                         break;
                 }
                 
