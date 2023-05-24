@@ -161,21 +161,29 @@ namespace MyJournal
                 connection.Close();
             }
         }
-        public static void AddGroupSubject(int SubjectId,int GroupId)
+        public static void AddGroupSubject(string SubjectId, string GroupId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                using (var command = new SQLiteCommand("INSERT INTO GroupSubject (SubjectId, GroupId) VALUES (@SubjectId, @GroupId)", connection))
+                using (var test = new SQLiteCommand($"SELECT COUNT(*) FROM GroupSubject WHERE SubjectId = {SubjectId} AND GroupId = {SubjectId}", connection))
                 {
-                    command.Parameters.AddWithValue("@SubjectId", SubjectId);
-                    command.Parameters.AddWithValue("@GroupId", GroupId);
-                    command.ExecuteNonQuery();
+                    int count = Convert.ToInt32(test.ExecuteScalar());
+                    if (count == 0)
+                    {
+                        using (var command = new SQLiteCommand("INSERT INTO GroupSubject (SubjectId, GroupId) VALUES (@SubjectId, @GroupId)", connection))
+                        {
+                            command.Parameters.AddWithValue("@SubjectId", SubjectId);
+                            command.Parameters.AddWithValue("@GroupId", GroupId);
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    else { }
+                    connection.Close();
                 }
-                connection.Close();
             }
         }
-        public static void RemoveGroupSubject(int SubjectId, int GroupId)
+        public static void RemoveGroupSubject(string SubjectId, string GroupId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -196,21 +204,29 @@ namespace MyJournal
                 connection.Close();
             }
         }
-        public static void AddTeachersGroups(int TeacherId, int GroupId)
+        public static void AddTeachersGroups(string TeacherId, string GroupId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                using (var command = new SQLiteCommand("INSERT INTO TeachersGroups (TeacherId, GroupId) VALUES (@TeacherId, @GroupId)", connection))
+                using (var test = new SQLiteCommand($"SELECT COUNT(*) FROM TeachersGroups WHERE TeacherId = {TeacherId} AND GroupId = {GroupId}", connection))
                 {
-                    command.Parameters.AddWithValue("@TeacherId", TeacherId);
-                    command.Parameters.AddWithValue("@GroupId", GroupId);
-                    command.ExecuteNonQuery();
+                    int count = Convert.ToInt32(test.ExecuteScalar());
+                    if (count == 0)
+                    {
+                        using (var command = new SQLiteCommand("INSERT INTO TeachersGroups (TeacherId, GroupId) VALUES (@TeacherId, @GroupId)", connection))
+                        {
+                            command.Parameters.AddWithValue("@TeacherId", TeacherId);
+                            command.Parameters.AddWithValue("@GroupId", GroupId);
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    else { }
+                    connection.Close();
                 }
-                connection.Close();
             }
         }
-        public static void RemoveTeachersGroups(int TeacherId, int GroupId)
+        public static void RemoveTeachersGroups(string TeacherId, string GroupId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {

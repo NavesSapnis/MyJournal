@@ -52,6 +52,7 @@ namespace MyJournal
         {
             var dataSource = Sql.LoadDataFromTable(tableName);
             data.ItemsSource = dataSource.DefaultView;
+            LoadData();
         }
         public void tableComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -67,6 +68,7 @@ namespace MyJournal
         public Admin()
         {
             InitializeComponent();
+            ClearComboBoxes();
             LoadData();
             ResizeMode = ResizeMode.NoResize;
         }
@@ -92,7 +94,7 @@ namespace MyJournal
             }
             ClearGroupName();
             RefreshTable();
-        }
+        }//Добавление группы в бд через text box
         public void AddTeacher(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
@@ -112,7 +114,7 @@ namespace MyJournal
             }
             ClearUserInfo();
             RefreshTable();
-        }
+        }//Добавление учителя в бд через text box
         public void AddStudent(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
@@ -132,7 +134,7 @@ namespace MyJournal
             }
             ClearUserInfo();
             RefreshTable();
-        }
+        }//Добавление студента в бд через text box
         public void AddSubject(object sender, RoutedEventArgs e)
         {
             var name = subjectName.Text;
@@ -154,35 +156,35 @@ namespace MyJournal
             }
             ClearSubjectName();
             RefreshTable();
-        }
+        }//Добавление предмета в бд через text box
         public void RemoveGroup(object sender, RoutedEventArgs e)
         {
             var name_ = groupName.Text;
             Sql.RemoveGroup(name_);
             ClearGroupName();
             RefreshTable();
-        }
+        }//Удаление группы из бд через text box
         public void RemoveTeacher(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
             Sql.RemoveTeacher(name_);
             ClearUserInfo();
             RefreshTable();
-        }
+        }//Удаление учителя из бд через text box
         public void RemoveStudent(object sender, RoutedEventArgs e)
         {
             var name_ = name.Text;
             Sql.RemoveStudent(name_);
             ClearUserInfo();
             RefreshTable();
-        }
+        }//Удаление студента из бд через text box
         public void RemoveSubject(object sender, RoutedEventArgs e)
         {
             var name_ = subjectName.Text;
             Sql.RemoveSubject(name_);
             ClearSubjectName();
             RefreshTable();
-        }
+        }//Удаление предмета из бд через text box
         public void Save(object sender, RoutedEventArgs e)
         {
             
@@ -197,8 +199,8 @@ namespace MyJournal
                 catch { MessageBox.Show("Ошибка при сохранении"); }
 
             }
-            
-        }
+
+        }//Сохрание изменений в DataGrid TODO УДАЛЕНИЕ
         public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             isEditing = true;
@@ -224,7 +226,7 @@ namespace MyJournal
                     dataTable.Rows.Remove(row);
                 }
             }
-        }
+        }//Удаление пустых строк из дататейбла
         public DataTable GetDataTableFromDataGrid()
         {
 
@@ -261,14 +263,11 @@ namespace MyJournal
         }
         public void LoadData() 
         {
-            ClearComboBoxes();
-            
             var subjects = Sql.LoadDataFromTable("Subjects");
             SelectSubject.DisplayMemberPath = "SubjectName";
             SelectSubject.SelectedValuePath = "SubjectId";
             SelectSubject.ItemsSource = subjects.DefaultView;
             
-
             var teachers = Sql.LoadDataFromTable("Teachers");
             SelectTeacher.DisplayMemberPath = "Name";
             SelectTeacher.SelectedValuePath = "Id";
@@ -283,19 +282,19 @@ namespace MyJournal
         }
         public void AddGroups(object sender, RoutedEventArgs e)
         {
-            Sql.AddGroupSubject(SelectSubject.SelectedValue.ToString()),SelectGroup.SelectedValue.ToString());
+            Sql.AddGroupSubject(SelectSubject.SelectedValue.ToString(),SelectGroup.SelectedValue.ToString()); RefreshTable();
         }
         public void RemoveGroups(object sender, RoutedEventArgs e)
         {
-            Sql.RemoveGroupSubject(int.Parse((string)SelectSubject.SelectedValue), int.Parse((string)SelectGroup.SelectedValue.ToString()));
+            Sql.RemoveGroupSubject(SelectSubject.SelectedValue.ToString(),SelectGroup.SelectedValue.ToString()); RefreshTable();
         }
         private void AddGroupsTeacher(object sender, RoutedEventArgs e)
         {
-            Sql.AddTeachersGroups(int.Parse((string)SelectTeacher.SelectedValue), int.Parse((string)SelectGroupTeacher.SelectedValue.ToString()));
+            Sql.AddTeachersGroups(SelectTeacher.SelectedValue.ToString(),SelectGroupTeacher.SelectedValue.ToString()); RefreshTable();
         }
         private void RemoveGroupsTeacher(object sender, RoutedEventArgs e)
         {
-            Sql.RemoveTeachersGroups(int.Parse((string)SelectTeacher.SelectedValue), int.Parse((string)SelectGroupTeacher.SelectedValue.ToString()));
+            Sql.RemoveTeachersGroups(SelectTeacher.SelectedValue.ToString(), SelectGroupTeacher.SelectedValue.ToString()); RefreshTable();
         }
         public void DeleteTable(object sender, RoutedEventArgs e)
         {
