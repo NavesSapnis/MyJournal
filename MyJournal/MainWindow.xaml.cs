@@ -42,15 +42,15 @@ namespace MyJournal
         {
             var name_ = name.Text;
             var password_ = password.Text;
-            EnterAdmin();
-            //if ((name_ == "Admin" && password_ == "Admin"))
-            //{
-            //    EnterAdmin();
-            //}
-            //else
-            //{
-            //    error.Content = "Ошибка авториации";
-            //}
+            if (Sql.AdminValidation(name_,password_))
+            {
+                EnterAdmin();
+            }
+            //TODO Авторизация
+            else
+            {
+                error.Content = "Ошибка авторизации";
+            }
         }
         public void RemoveText(object sender, EventArgs e)
         {

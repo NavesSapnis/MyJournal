@@ -68,8 +68,8 @@
             <ComboBoxItem Content="Выбери группу" />
             <Border BorderBrush="Black" BorderThickness="1" Height="4" Width="27"/>
         </ComboBox>
-        <Button Style="{StaticResource RoundedButtonStyle}" Content="Добавить" HorizontalAlignment="Left" Margin="289,562,0,0" VerticalAlignment="Top" Height="49" Width="168" Click="AddGroupsTeacher" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
-        <Button Style="{StaticResource RoundedButtonStyle}" Content="Удалить" HorizontalAlignment="Left" Margin="156,562,0,0" VerticalAlignment="Top" Height="49" Width="168" Click="RemoveGroupsTeacher" Grid.Row="1" Grid.Column="2"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Добавить" HorizontalAlignment="Left" Margin="300,562,0,0" VerticalAlignment="Top" Height="49" Width="168" Click="AddGroupsTeacher" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Удалить" HorizontalAlignment="Left" Margin="151,562,0,0" VerticalAlignment="Top" Height="49" Width="168" Click="RemoveGroupsTeacher" Grid.Row="1" Grid.Column="2"/>
         <Label Content="Группа" HorizontalAlignment="Left"
                Margin="72,476,0,0" Grid.Row="1" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="114"/>
         <Label Content="Предмет" HorizontalAlignment="Center" Margin="0,476,0,0" Grid.Row="1" VerticalAlignment="Top" Width="114" Grid.Column="1"/>

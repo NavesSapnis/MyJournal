@@ -185,6 +185,12 @@ namespace MyJournal
             ClearSubjectName();
             RefreshTable();
         }//Удаление предмета из бд через text box
+        public void SaveAction()
+        {
+            var table = GetDataTableFromDataGrid();
+            Sql.Save(table, tableName);
+            RefreshTable();
+        }
         public void Save(object sender, RoutedEventArgs e)
         {
             
@@ -192,9 +198,7 @@ namespace MyJournal
             {
                 try
                 {
-                    var table = GetDataTableFromDataGrid();
-                    Sql.Save(table, tableName);
-                    RefreshTable();
+                    SaveAction();
                 }
                 catch { MessageBox.Show("Ошибка при сохранении"); }
 
@@ -288,11 +292,11 @@ namespace MyJournal
         {
             Sql.RemoveGroupSubject(SelectSubject.SelectedValue.ToString(),SelectGroup.SelectedValue.ToString()); RefreshTable();
         }
-        private void AddGroupsTeacher(object sender, RoutedEventArgs e)
+        public void AddGroupsTeacher(object sender, RoutedEventArgs e)
         {
             Sql.AddTeachersGroups(SelectTeacher.SelectedValue.ToString(),SelectGroupTeacher.SelectedValue.ToString()); RefreshTable();
         }
-        private void RemoveGroupsTeacher(object sender, RoutedEventArgs e)
+        public void RemoveGroupsTeacher(object sender, RoutedEventArgs e)
         {
             Sql.RemoveTeachersGroups(SelectTeacher.SelectedValue.ToString(), SelectGroupTeacher.SelectedValue.ToString()); RefreshTable();
         }

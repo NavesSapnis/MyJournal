@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using System.Windows.Markup;
 using MyJournal.Class;
 using System.Windows.Controls;
+using System.Text.RegularExpressions;
 
 namespace MyJournal
 {
@@ -429,6 +430,42 @@ namespace MyJournal
                 }
             }
         }
-        
+        public static bool AdminValidation(string Name, string Password)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    using (var test = new SQLiteCommand($"SELECT COUNT(*) FROM Admin WHERE Name = \"{Name}\" AND Password = \"{Password}\"", connection))
+                    {
+                        int count = Convert.ToInt32(test.ExecuteScalar());
+                        connection.Close();
+                        if (count >= 1) { return true; }
+                        else { return false; }
+                    }
+
+                }
+                catch { return false; }
+            }
+        }
+        public static bool LoginValidationTeacher(string Name, string Password)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    using (var test = new SQLiteCommand($"SELECT COUNT(*) FROM Teachers WHERE Name = {Name} AND Password = {Password}", connection))
+                    {
+                        int count = Convert.ToInt32(test.ExecuteScalar());
+                        connection.Close();
+                        if (count == 1) { return true; }
+                        else { return false; }
+                    }
+                }
+            }
+            catch { return false; }
+        }
     }
 }
