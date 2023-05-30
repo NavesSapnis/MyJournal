@@ -25,12 +25,26 @@ namespace MyJournal
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static string Name { get; set; }
+        public static string Password { get; set; }
         public void EnterAdmin()
         {
             Admin admin = new Admin();
             Close();
             admin.Show();
         }
+        public void EnterStudent()
+        {
+            StudentWindow student = new StudentWindow();
+            Close();
+            student.Show();
+        }
+        //public void EnterTeacher()
+        //{
+        //    TeacherWindow teacher = new TeacherWindow();
+        //    Close();
+        //    teacher.Show();
+        //}
         private void Enter(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -51,26 +65,25 @@ namespace MyJournal
         }
         public void Next()
         {
-            var name_ = name.Text;
-            var password_ = password.Text;
-            if (Sql.AdminValidation(name_,password_))
-            {
-                EnterAdmin();
-            }
-            else if(Sql.LoginValidationTeacher(name_, password_)&&TeacherBox())
-            {
-                //Учитель
-                MessageBox.Show("Вы хуй");
-            }
-            else if (Sql.LoginValidationStudent(name_,password_))
-            {
-                //Студент
-                MessageBox.Show("Вы  не хуй");
-            }
-            else
-            {
-                error.Content = "Ошибка авторизации";
-            }
+            Name = name.Text;
+            Password = password.Text;
+            EnterStudent();
+            //if (Sql.AdminValidation(Name, Password))
+            //{
+            //    EnterAdmin();
+            //}
+            //else if(Sql.LoginValidationTeacher(Name, Password) &&TeacherBox())
+            //{
+            //    //Учитель
+            //}
+            //else if (Sql.LoginValidationStudent(Name, Password))
+            //{
+            //    EnterStudent();
+            //}
+            //else
+            //{
+            //    error.Content = "Ошибка авторизации";
+            //}
         }
         public void RemoveText(object sender, EventArgs e)
         {

@@ -485,5 +485,37 @@ namespace MyJournal
             }
             catch { return false; }
         }
+        public static List<MarksData> GetMarksByName(string name)
+        {
+            List<MarksData> marksList = new List<MarksData>();
+
+            string query = @"
+        SELECT m.Grade, s.SubjectName
+        FROM Marks AS m
+        JOIN Students AS st ON m.StudentId = st.id
+        JOIN Subjects AS s ON m.SubjectId = s.SubjectId
+        WHERE st.Name = @StudentName";
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@StudentName", name);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string grade = reader["Grade"].ToString();
+                            string subjectName = reader["SubjectName"].ToString();
+
+                            marksList.Add(new MarksData { Grade = grade, SubjectName = subjectName });
+                        }
+                    }
+                }
+            }
+            return marksList;
+        }
     }
 }
