@@ -19,6 +19,7 @@
         <TextBox Style="{StaticResource CustomTextBoxStyle}" GotFocus="RemoveText" LostFocus="AddText" Tag="Имя" HorizontalAlignment="Center" Margin="0,91,0,0" TextWrapping="NoWrap" Text="Имя" VerticalAlignment="Top" Width="262" FontSize="22" Name="name"/>
         <TextBox Style="{StaticResource CustomTextBoxStyle}" GotFocus="RemoveText" LostFocus="AddText" Tag="Пароль" HorizontalAlignment="Center" Margin="0,171,0,0" TextWrapping="NoWrap" Text="Пароль" VerticalAlignment="Top" Width="262" FontSize="22" Name="password" Cursor=""/>
         <Button Content="Вход" Style="{StaticResource RoundedButtonStyle}" Margin="0,248,0,0" VerticalAlignment="Top" Width="112" Height="35" FontSize="22"  Name="Login" Click="NextWindow"/>
-        <Label Style="{StaticResource CustomLabelStyle2}" Content="" HorizontalAlignment="Center" Margin="0,215,0,0" VerticalAlignment="Top" FontSize="16" RenderTransformOrigin="0.632,0.23" Name="error"/>
+        <Label Style="{StaticResource CustomLabelStyle2}" Content="" HorizontalAlignment="Center" Margin="0,135,0,0" VerticalAlignment="Top" FontSize="16" RenderTransformOrigin="0.632,0.23" Name="error" Width="158"/>
+        <CheckBox Style="{StaticResource CustomCheckBoxStyle}" Content="Я преподаватель" HorizontalAlignment="Center" Margin="0,225,0,0" VerticalAlignment="Top" Name="checkTeacher"/>
     </Grid>
 </Window>

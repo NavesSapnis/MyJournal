@@ -38,6 +38,17 @@ namespace MyJournal
                 Next();
             }
         }
+        public bool TeacherBox()
+        {
+            if ((bool)checkTeacher.IsChecked)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public void Next()
         {
             var name_ = name.Text;
@@ -46,7 +57,16 @@ namespace MyJournal
             {
                 EnterAdmin();
             }
-            //TODO Авторизация
+            else if(Sql.LoginValidationTeacher(name_, password_)&&TeacherBox())
+            {
+                //Учитель
+                MessageBox.Show("Вы хуй");
+            }
+            else if (Sql.LoginValidationStudent(name_,password_))
+            {
+                //Студент
+                MessageBox.Show("Вы  не хуй");
+            }
             else
             {
                 error.Content = "Ошибка авторизации";

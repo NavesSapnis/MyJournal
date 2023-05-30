@@ -102,7 +102,7 @@ namespace MyJournal
             var group_ = groups.Text;
             try
             {
-                if (!string.IsNullOrEmpty(name_) && (!string.IsNullOrEmpty(password_)))
+                if (!string.IsNullOrEmpty(name_) && (!string.IsNullOrEmpty(password_))&& name_ != "Имя" && password_ != "Пароль")
                 {
                     Sql.AddTeacher(name_, password_, group_);
                     MessageBox.Show("Учитель добавлен");
@@ -122,7 +122,7 @@ namespace MyJournal
             var group_ = groups.Text;
             try
             {
-                if (!string.IsNullOrEmpty(name_) && (!string.IsNullOrEmpty(password_)))
+                if (!string.IsNullOrEmpty(name_) && (!string.IsNullOrEmpty(password_))&& name_ != "Имя" && password_ != "Пароль")
                 {
                     Sql.AddStudent(name_, password_, group_);
                     MessageBox.Show("Ученик добавлен");
@@ -166,17 +166,25 @@ namespace MyJournal
         }//Удаление группы из бд через text box
         public void RemoveTeacher(object sender, RoutedEventArgs e)
         {
-            var name_ = name.Text;
-            Sql.RemoveTeacher(name_);
-            ClearUserInfo();
-            RefreshTable();
+            try
+            {
+                var name_ = name.Text;
+                Sql.RemoveTeacher(name_);
+                ClearUserInfo();
+                RefreshTable();
+            }
+            catch {MessageBox.Show("Учитель не найден"); }
         }//Удаление учителя из бд через text box
         public void RemoveStudent(object sender, RoutedEventArgs e)
         {
-            var name_ = name.Text;
-            Sql.RemoveStudent(name_);
-            ClearUserInfo();
-            RefreshTable();
+            try
+            {
+                var name_ = name.Text;
+                Sql.RemoveStudent(name_);
+                ClearUserInfo();
+                RefreshTable();
+            }
+            catch { MessageBox.Show("Учитель не найден"); }
         }//Удаление студента из бд через text box
         public void RemoveSubject(object sender, RoutedEventArgs e)
         {

@@ -119,5 +119,36 @@
         <Setter Property="RowHeight" Value="30" />
         <Setter Property="Padding" Value="5" />
     </Style>
+    <Style x:Key="CustomCheckBoxStyle" TargetType="CheckBox">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Grid Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="CheckBorder" BorderThickness="1" BorderBrush="Black" Background="White" Width="16" Height="16">
+                            <Grid x:Name="CheckGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+                                <Path x:Name="CheckMark" Stroke="Black" StrokeThickness="2" Data="M 1,5 4,9 10,1" />
+                            </Grid>
+                        </Border>
+                        <ContentPresenter Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckGrid" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 </ResourceDictionary>

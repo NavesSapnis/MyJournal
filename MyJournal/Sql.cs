@@ -456,7 +456,25 @@ namespace MyJournal
                 using (var connection = new SQLiteConnection(connectionString))
                 {
                     connection.Open();
-                    using (var test = new SQLiteCommand($"SELECT COUNT(*) FROM Teachers WHERE Name = {Name} AND Password = {Password}", connection))
+                    using (var test = new SQLiteCommand($"SELECT COUNT(*) FROM Teachers WHERE Name = \"{Name}\" AND Password = \"{Password}\"", connection))
+                    {
+                        int count = Convert.ToInt32(test.ExecuteScalar());
+                        connection.Close();
+                        if (count == 1) { return true; }
+                        else { return false; }
+                    }
+                }
+            }
+            catch { return false; }
+        }
+        public static bool LoginValidationStudent(string Name, string Password)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    using (var test = new SQLiteCommand($"SELECT COUNT(*) FROM Students WHERE Name = \"{Name}\" AND Password = \"{Password}\"", connection))
                     {
                         int count = Convert.ToInt32(test.ExecuteScalar());
                         connection.Close();
