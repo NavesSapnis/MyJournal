@@ -14,6 +14,6 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
-        <DataGrid Style="{StaticResource DataGridStyle}" d:ItemsSource="{d:SampleData ItemCount=5}" x:Name="data" AutoGenerateColumns="True" Grid.Column="1" Margin="239,75,30,281" Grid.Row="1" Grid.ColumnSpan="2" />
+        <DataGrid Style="{StaticResource DataGridStyle}" d:ItemsSource="{d:SampleData ItemCount=5}" x:Name="data" AutoGenerateColumns="True" Margin="63,75,30,106" />
     </Grid>
 </Window>

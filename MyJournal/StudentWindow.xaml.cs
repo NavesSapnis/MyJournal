@@ -26,7 +26,7 @@ namespace MyJournal
         }
         public void LoadData()
         {
-            data.ItemsSource = Sql.GetMarksByName("Алекс");
+            data.ItemsSource = Sql.GetSubjectsForGroup(Sql.GetStudentGroup("Алекс"));
         }
     }
 }

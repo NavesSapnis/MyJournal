@@ -485,37 +485,65 @@ namespace MyJournal
             }
             catch { return false; }
         }
-        public static List<MarksData> GetMarksByName(string name)
+        public static int GetStudentGroup(string studentName)
         {
-            List<MarksData> marksList = new List<MarksData>();
-
-            string query = @"
-        SELECT m.Grade, s.SubjectName
-        FROM Marks AS m
-        JOIN Students AS st ON m.StudentId = st.id
-        JOIN Subjects AS s ON m.SubjectId = s.SubjectId
-        WHERE st.Name = @StudentName";
+            int groupId = 0;
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
+                string query = @"
+            SELECT g.GroupId
+            FROM Students s
+            JOIN Groups g ON s.GroupId = g.GroupId
+            WHERE s.Name = @StudentName";
+
                 using (SQLiteCommand command = new SQLiteCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@StudentName", name);
+                    command.Parameters.AddWithValue("@StudentName", studentName);
+
+                    object result = command.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        groupId = Convert.ToInt32(result);
+                    }
+                }
+                connection.Close();
+            }
+
+            return groupId;
+        }
+        public static List<string> GetSubjectsForGroup(int groupId)
+        {
+            List<string> subjects = new List<string>();
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                string query = @"
+            SELECT s.SubjectId, s.SubjectName
+            FROM GroupSubject gs
+            JOIN Subjects s ON gs.SubjectId = s.SubjectId
+            WHERE gs.GroupId = @GroupId";
+
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@GroupId", groupId);
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            string grade = reader["Grade"].ToString();
-                            string subjectName = reader["SubjectName"].ToString();
-
-                            marksList.Add(new MarksData { Grade = grade, SubjectName = subjectName });
+                            string subjectName = reader.GetString(1);
+                            subjects.Add(subjectName);
                         }
                     }
                 }
+                connection.Close();
             }
-            return marksList;
+
+            return subjects;
         }
     }
 }
