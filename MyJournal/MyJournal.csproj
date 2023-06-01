@@ -122,6 +122,7 @@
     <Compile Include="Class\Teacher.cs" />
     <Compile Include="Class\TeachersGroups.cs" />
     <Compile Include="Class\User.cs" />
+    <Compile Include="MarkHelper\MarksHelper.cs" />
     <Compile Include="Sql.cs" />
     <Compile Include="StudentWindow.xaml.cs">
       <DependentUpon>StudentWindow.xaml</DependentUpon>

@@ -545,5 +545,39 @@ namespace MyJournal
 
             return subjects;
         }
+        public static List<int> GetStudentSubjectGrades(string Name, string SubjectName)
+        {
+            List<int> grades = new List<int>();
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                string query = @"
+            SELECT m.Grade
+            FROM Marks m
+            JOIN Students s ON m.StudentId = s.Id
+            JOIN Subjects subj ON m.SubjectId = subj.SubjectId
+            WHERE s.Name = @StudentName
+            AND subj.SubjectName = @SubjectName";
+
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@StudentName", Name);
+                    command.Parameters.AddWithValue("@SubjectName", SubjectName);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int grade = Convert.ToInt32(reader["Grade"]);
+                            grades.Add(grade);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            return grades;
+        }
     }
 }

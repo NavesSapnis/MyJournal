@@ -25,7 +25,7 @@ namespace MyJournal
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Name { get; set; }
+        public new static string Name { get; set; }
         public static string Password { get; set; }
         public void EnterAdmin()
         {

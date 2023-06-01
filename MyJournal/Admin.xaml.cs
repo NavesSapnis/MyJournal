@@ -217,7 +217,7 @@ namespace MyJournal
         {
             isEditing = true;
         }
-        public void RemoveEmptyRows(DataTable dataTable)
+        public static void RemoveEmptyRows(DataTable dataTable)
         {
             for (int i = dataTable.Rows.Count - 1; i >= 0; i--)
             {
@@ -241,8 +241,8 @@ namespace MyJournal
         }//Удаление пустых строк из дататейбла
         public DataTable GetDataTableFromDataGrid()
         {
-
             DataTable dataTable = new DataTable();
+            
             foreach (DataGridColumn column in data.Columns)
             {
                 dataTable.Columns.Add(column.Header.ToString());
@@ -262,7 +262,7 @@ namespace MyJournal
                 }
                 dataTable.Rows.Add(newRow);
             }
-            RemoveEmptyRows(dataTable);
+            Admin.RemoveEmptyRows(dataTable);
             return dataTable;
             //Рабочие костыли ура
         }

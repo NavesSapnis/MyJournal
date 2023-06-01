@@ -1,7 +1,9 @@
 ﻿using MyJournal.Class;
+using MyJournal.MarkHelper;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,20 +23,42 @@ namespace MyJournal
     /// </summary>
     public partial class StudentWindow : Window
     {
+        public new string Name = MainWindow.Name;
         public StudentWindow()
         {
             InitializeComponent();
             LoadData();
+            ResizeMode = ResizeMode.NoResize;
         }
         public void LoadData()
         {
-            var subjects = Sql.GetSubjectsForGroup(Sql.GetStudentGroup("Алекс"));
+            hello.Content = Hello();
+            var subjects = Sql.GetSubjectsForGroup(Sql.GetStudentGroup(Name));
             DataTable dataTable = new DataTable();
             for(int i = 0;i< subjects.Count; i++)
             {
                 dataTable.Columns.Add(subjects[i].ToString());
+            } 
+            for (int i = 0; i < subjects.Count; i++)
+            {
+                var rowIndex = 0;
+                var grades = Sql.GetStudentSubjectGrades(Name, subjects[i]);
+                foreach (var grade in grades)
+                {
+                    dataTable.Rows.Add();
+                    dataTable.Rows[rowIndex].SetField(subjects[i], grade);
+                    rowIndex++;
+                }
+                dataTable.Rows.Add();
+                dataTable.Rows[rowIndex].SetField(subjects[i], "Ср. балл: "+MarksHelper.GetAverage(grades.Sum(), grades.Count()));
+                
             }
+            Admin.RemoveEmptyRows(dataTable);
             data.ItemsSource = dataTable.DefaultView;
+        }
+        public string Hello()
+        {
+            return $"Приветствуем, {Name}";
         }
     }
 }
