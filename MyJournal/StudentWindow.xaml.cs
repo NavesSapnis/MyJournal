@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MyJournal.Class;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +28,13 @@ namespace MyJournal
         }
         public void LoadData()
         {
-            data.ItemsSource = Sql.GetSubjectsForGroup(Sql.GetStudentGroup("Алекс"));
+            var subjects = Sql.GetSubjectsForGroup(Sql.GetStudentGroup("Алекс"));
+            DataTable dataTable = new DataTable();
+            for(int i = 0;i< subjects.Count; i++)
+            {
+                dataTable.Columns.Add(subjects[i].ToString());
+            }
+            data.ItemsSource = dataTable.DefaultView;
         }
     }
 }
