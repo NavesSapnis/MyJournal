@@ -390,6 +390,63 @@ namespace MyJournal
                 return dataSource;
             }
         }
+        public static List<string> GetStudentsOfGroup(int GroupId)
+        {
+            List<string> students = new List<string>();
+            string query = "SELECT * FROM Students WHERE GroupId = @GroupId";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@GroupId", GroupId);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string student = reader.GetString(1);
+                            students.Add(student);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+            return students;
+
+        }
+        public static DataTable GetSubjectsForGroupDataTable(int GroupId)
+        {
+            string query = "SELECT Subjects.SubjectId, Subjects.SubjectName FROM GroupSubject JOIN Subjects ON GroupSubject.SubjectId = Subjects.SubjectId WHERE GroupSubject.GroupId = @GroupId";
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@GroupId", GroupId);
+                SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+                DataTable dataTable = new DataTable();
+                adapter.Fill(dataTable);
+                connection.Close();
+                return dataTable;
+            }
+        }
+        public static DataTable GetGroupsOfTeacher(string Name)
+        {
+            string query = "SELECT Groups.GroupId, Groups.GroupName FROM Groups JOIN Teachers ON Groups.GroupId = Teachers.Id WHERE Teachers.Name = @Name";
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@Name", Name);
+                SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+                DataTable dataTable = new DataTable();
+                adapter.Fill(dataTable);
+                connection.Close();
+                return dataTable;
+            }
+        }
         public static void DeleteAll(string table)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))

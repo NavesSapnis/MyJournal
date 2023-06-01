@@ -39,12 +39,12 @@ namespace MyJournal
             Close();
             student.Show();
         }
-        //public void EnterTeacher()
-        //{
-        //    TeacherWindow teacher = new TeacherWindow();
-        //    Close();
-        //    teacher.Show();
-        //}
+        public void EnterTeacher()
+        {
+            TeacherWindow teacher = new TeacherWindow();
+            Close();
+            teacher.Show();
+        }
         private void Enter(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -67,7 +67,7 @@ namespace MyJournal
         {
             Name = name.Text;
             Password = password.Text;
-            EnterStudent();
+            EnterTeacher();
             //if (Sql.AdminValidation(Name, Password))
             //{
             //    EnterAdmin();
