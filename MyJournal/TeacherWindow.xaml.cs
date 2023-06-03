@@ -1,4 +1,5 @@
 ﻿using MyJournal.Class;
+using MyJournal.MarkHelper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -30,6 +31,33 @@ namespace MyJournal
             ResizeMode = ResizeMode.NoResize;
             LoadGroups();
         }
+        public DataTable GetDataTableFromDataGrid()
+        {
+            DataTable dataTable = new DataTable();
+
+            foreach (DataGridColumn column in data.Columns)
+            {
+                dataTable.Columns.Add(column.Header.ToString());
+            }
+
+            foreach (var item in data.Items)
+            {
+                DataRow newRow = dataTable.NewRow();
+
+                foreach (DataGridColumn column in data.Columns)
+                {
+                    TextBlock textBlock = column.GetCellContent(item) as TextBlock;
+                    if (textBlock != null)
+                    {
+                        newRow[column.Header.ToString()] = textBlock.Text;
+                    }
+                }
+                dataTable.Rows.Add(newRow);
+            }
+            Admin.RemoveEmptyRows(dataTable);
+            return dataTable;
+            //Рабочие костыли ура
+        }
         public void LoadGroups()
         {
             var groups = Sql.GetGroupsOfTeacher(Name);
@@ -39,25 +67,49 @@ namespace MyJournal
         }
         public void LoadSubjects(int GroupId)
         {
-            Subject.Items.Clear();
             var subjectsOfThisGroup = Sql.GetSubjectsForGroupDataTable(GroupId);
             Subject.DisplayMemberPath = "SubjectName";
             Subject.SelectedValuePath = "SubjectId";
             Subject.ItemsSource = subjectsOfThisGroup.DefaultView;
         }
-        public void LoadStudents(List<string> students)
+        public void LoadStudentSubjectMarks(List<string> students)
         {
             DataTable dataTable = new DataTable();
             for (int i = 0; i < students.Count; i++)
             {
                 dataTable.Columns.Add(students[i].ToString());
             }
+            //foreach (string student in students)
+            //{
+            //    DataGridComboBoxColumn column = new DataGridComboBoxColumn();
+            //    column.Header = student;
+            //    column.SelectedValueBinding = new Binding(student);
+            //    column.ItemsSource = Enumerable.Range(1, 10).Select(x => x.ToString());
+            //    data.Columns.Add(column);
+            //}
+
+            for (int i = 0; i < students.Count; i++)
+            {
+                int rowIndex = 0;
+                var grades = Sql.GetStudentSubjectGrades(students[i], Sql.GetSubjectNameById(Convert.ToInt32(Subject.SelectedValue)));
+                foreach (var grade in grades)
+                {
+                    dataTable.Rows.Add();
+                    dataTable.Rows[rowIndex].SetField(students[i], grade);
+                    rowIndex++;
+                }
+            }
+            Admin.RemoveEmptyRows(dataTable);
             data.ItemsSource = dataTable.DefaultView;
         }
         private void Group_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             LoadSubjects(Convert.ToInt32(Group.SelectedValue));
-            LoadStudents(Sql.GetStudentsOfGroup(Convert.ToInt32(Group.SelectedValue)));
+        }
+
+        private void Subject_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            LoadStudentSubjectMarks(Sql.GetStudentsOfGroup(Convert.ToInt32(Group.SelectedValue)));
         }
     }
 }

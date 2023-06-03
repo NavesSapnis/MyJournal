@@ -14,9 +14,9 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
-        <DataGrid CellStyle="{StaticResource CellBorderStyle}" Style="{StaticResource DataGridStyle}" d:ItemsSource="{d:SampleData ItemCount=5}" x:Name="data" AutoGenerateColumns="True" Margin="10,165,10,10" />
+        <DataGrid CellStyle="{StaticResource {x:Type DataGridCell}}" Style="{StaticResource DataGridStyle}" d:ItemsSource="{d:SampleData ItemCount=5}" x:Name="data" AutoGenerateColumns="True" Margin="10,165,10,10" />
         <ComboBox HorizontalAlignment="Left" Margin="237,41,0,0" VerticalAlignment="Top" Width="120" Height="21" Name="Group" SelectionChanged="Group_SelectionChanged"/>
-        <ComboBox HorizontalAlignment="Left" Margin="414,41,0,0" VerticalAlignment="Top" Width="120" Height="21" Name="Subject"/>
+        <ComboBox HorizontalAlignment="Left" Margin="414,41,0,0" VerticalAlignment="Top" Width="120" Height="21" Name="Subject" SelectionChanged="Subject_SelectionChanged"/>
         <Label Style="{StaticResource CustomLabelStyle}" Content="Группа" HorizontalAlignment="Left" Margin="268,10,0,0" VerticalAlignment="Top"/>
         <Label Style="{StaticResource CustomLabelStyle}" Content="Предмет" HorizontalAlignment="Left" Margin="439,10,0,0" VerticalAlignment="Top"/>
     </Grid>

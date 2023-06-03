@@ -432,8 +432,55 @@ namespace MyJournal
                 return dataTable;
             }
         }
+        public static string GetGroupNameById(int Id)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string selectQuery = $"SELECT GroupName FROM Groups WHERE GroupId = {Id}";
+                using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
+                {
+                    object result = command.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        string groupName = result.ToString();
+                        return groupName;
+                    }
+                    else
+                    {
+                        return "Кураторской группы нет";
+                    }
+
+                }
+            }
+        }
+        public static int GetTeacherGroupId(string Name)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string selectQuery = $"SELECT MainGroup FROM Teachers WHERE Name = '{Name}';";
+                using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
+                {
+                    object result = command.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        int groupId = Convert.ToInt32(result);
+                        return groupId;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+
+                }
+            }
+        }
         public static DataTable GetGroupsOfTeacher(string Name)
         {
+            var mainGroup = GetTeacherGroupId(Name);
             string query = "SELECT Groups.GroupId, Groups.GroupName FROM Groups JOIN Teachers ON Groups.GroupId = Teachers.Id WHERE Teachers.Name = @Name";
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -443,6 +490,9 @@ namespace MyJournal
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
                 DataTable dataTable = new DataTable();
                 adapter.Fill(dataTable);
+                int groupId = GetTeacherGroupId(Name);
+                string groupName = GetGroupNameById(groupId);
+                dataTable.Rows.Add(groupId,groupName);
                 connection.Close();
                 return dataTable;
             }
@@ -484,6 +534,20 @@ namespace MyJournal
                         return 0;
                     }
                     
+                }
+            }
+        }
+        public static string GetSubjectNameById(int Id) 
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string selectQuery = $"SELECT SubjectName FROM Subjects WHERE SubjectId = {Id};";
+                using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
+                {
+                    object result = command.ExecuteScalar();
+                    string subjectName = result.ToString();
+                    return subjectName;
                 }
             }
         }
