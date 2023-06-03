@@ -79,15 +79,6 @@ namespace MyJournal
             {
                 dataTable.Columns.Add(students[i].ToString());
             }
-            //foreach (string student in students)
-            //{
-            //    DataGridComboBoxColumn column = new DataGridComboBoxColumn();
-            //    column.Header = student;
-            //    column.SelectedValueBinding = new Binding(student);
-            //    column.ItemsSource = Enumerable.Range(1, 10).Select(x => x.ToString());
-            //    data.Columns.Add(column);
-            //}
-
             for (int i = 0; i < students.Count; i++)
             {
                 int rowIndex = 0;
@@ -97,7 +88,7 @@ namespace MyJournal
                     dataTable.Rows.Add();
                     dataTable.Rows[rowIndex].SetField(students[i], grade);
                     rowIndex++;
-                }
+                } 
             }
             Admin.RemoveEmptyRows(dataTable);
             data.ItemsSource = dataTable.DefaultView;
@@ -110,6 +101,15 @@ namespace MyJournal
         private void Subject_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             LoadStudentSubjectMarks(Sql.GetStudentsOfGroup(Convert.ToInt32(Group.SelectedValue)));
+        }
+        public void Save()
+        {
+            var dataTable = GetDataTableFromDataGrid();
+            int a = 0;
+        }
+        private void SaveAction(object sender, RoutedEventArgs e)
+        {
+            Save();
         }
     }
 }
