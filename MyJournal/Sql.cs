@@ -9,7 +9,6 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Xml.Linq;
 using System.Windows.Markup;
-using MyJournal.Class;
 using System.Windows.Controls;
 using System.Text.RegularExpressions;
 
@@ -45,6 +44,19 @@ namespace MyJournal
                 return subjectId;
             }
         }
+        public static int GetTeacherIdByName(string Name)
+        {
+            string query = "SELECT Id FROM Teachers WHERE Name = @Name";
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@Name", Name);
+                int teacherId = Convert.ToInt32(command.ExecuteScalar());
+                connection.Close();
+                return teacherId;
+            }
+        }
         public static void RemoveMarks(int studentId, int subjectId)
         {
             string query = "DELETE FROM Marks WHERE StudentId = @StudentId AND SubjectId = @SubjectId";
@@ -60,21 +72,16 @@ namespace MyJournal
         }
         public static void AddMark(int studentId, int subjectId, int grade)
         {
-            string query = "INSERT INTO Marks (StudentId, SubjectId, Grade) VALUES (@StudentId, @SubjectId, @Grade)";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (var command = new SQLiteCommand("INSERT INTO Marks (StudentId, SubjectId, Grade) VALUES (@StudentId, @SubjectId, @Grade)", connection))
                 {
                     command.Parameters.AddWithValue("@StudentId", studentId);
                     command.Parameters.AddWithValue("@SubjectId", subjectId);
                     command.Parameters.AddWithValue("@Grade", grade);
-
                     command.ExecuteNonQuery();
                 }
-
                 connection.Close();
             }
         }
@@ -326,7 +333,7 @@ namespace MyJournal
                 connection.Close();
             }
         }
-        public static void Save(DataTable dataTable,string table)
+        public static void Save(DataTable dataTable, string table)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -533,12 +540,12 @@ namespace MyJournal
                 }
             }
         }
-        public static int GetTeacherGroupId(string Name)
+        public static int GetTeacherGroupId(int Id)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string selectQuery = $"SELECT MainGroup FROM Teachers WHERE Name = '{Name}';";
+                string selectQuery = $"SELECT MainGroup FROM Teachers WHERE Id = {Id}";
                 using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
                 {
                     object result = command.ExecuteScalar();
@@ -556,21 +563,20 @@ namespace MyJournal
                 }
             }
         }
-        public static DataTable GetGroupsOfTeacher(string Name)
+        public static DataTable GetGroupsOfTeacher(int Id)
         {
-            var mainGroup = GetTeacherGroupId(Name);
-            string query = "SELECT Groups.GroupId, Groups.GroupName FROM Groups JOIN Teachers ON Groups.GroupId = Teachers.Id WHERE Teachers.Name = @Name";
+            string query = "SELECT TeachersGroups.GroupId, Groups.GroupName FROM TeachersGroups JOIN Groups ON TeachersGroups.GroupId = Groups.GroupId WHERE TeacherId = @Id";
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
                 SQLiteCommand command = new SQLiteCommand(query, connection);
-                command.Parameters.AddWithValue("@Name", Name);
+                command.Parameters.AddWithValue("@Id", Id);
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
                 DataTable dataTable = new DataTable();
                 adapter.Fill(dataTable);
-                int groupId = GetTeacherGroupId(Name);
+                int groupId = GetTeacherGroupId(Id);
                 string groupName = GetGroupNameById(groupId);
-                dataTable.Rows.Add(groupId,groupName);
+                dataTable.Rows.Add(groupId, groupName);
                 connection.Close();
                 return dataTable;
             }
@@ -611,20 +617,21 @@ namespace MyJournal
                         Console.WriteLine($"Группа с названием '{groupName}' не найдена, добавьте ее.");
                         return 0;
                     }
-                    
+
                 }
             }
         }
-        public static string GetSubjectNameById(int Id) 
+        public static string GetSubjectNameById(int Id)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string selectQuery = $"SELECT SubjectName FROM Subjects WHERE SubjectId = {Id};";
+                string selectQuery = $"SELECT SubjectName FROM Subjects WHERE SubjectId = {Id}";
                 using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
                 {
                     object result = command.ExecuteScalar();
                     string subjectName = result.ToString();
+                    connection.Close();
                     return subjectName;
                 }
             }
@@ -744,40 +751,32 @@ namespace MyJournal
 
             return subjects;
         }
-        public static List<int> GetStudentSubjectGrades(string Name, string SubjectName)
+        public static List<int> GetStudentSubjectGrades(int studentId, int subjectId)
         {
             List<int> grades = new List<int>();
+
+            string query = "SELECT Grade FROM Marks WHERE StudentId = @StudentId AND SubjectId = @SubjectId";
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@StudentId", studentId);
+                command.Parameters.AddWithValue("@SubjectId", subjectId);
+                SQLiteDataReader reader = command.ExecuteReader();
 
-                string query = @"
-            SELECT m.Grade
-            FROM Marks m
-            JOIN Students s ON m.StudentId = s.Id
-            JOIN Subjects subj ON m.SubjectId = subj.SubjectId
-            WHERE s.Name = @StudentName
-            AND subj.SubjectName = @SubjectName";
-
-                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                while (reader.Read())
                 {
-                    command.Parameters.AddWithValue("@StudentName", Name);
-                    command.Parameters.AddWithValue("@SubjectName", SubjectName);
-
-                    using (SQLiteDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int grade = Convert.ToInt32(reader["Grade"]);
-                            grades.Add(grade);
-                        }
-                    }
+                    int grade = Convert.ToInt32(reader["Grade"]);
+                    grades.Add(grade);
                 }
+
+                reader.Close();
                 connection.Close();
             }
+
             return grades;
         }
-        
+
     }
 }

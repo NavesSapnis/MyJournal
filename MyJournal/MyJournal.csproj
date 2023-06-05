@@ -114,14 +114,6 @@
     <Compile Include="Admin.xaml.cs">
       <DependentUpon>Admin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Class\Group.cs" />
-    <Compile Include="Class\Mark.cs" />
-    <Compile Include="Class\MarksData.cs" />
-    <Compile Include="Class\Student.cs" />
-    <Compile Include="Class\Subject.cs" />
-    <Compile Include="Class\Teacher.cs" />
-    <Compile Include="Class\TeachersGroups.cs" />
-    <Compile Include="Class\User.cs" />
     <Compile Include="MarkHelper\MarksHelper.cs" />
     <Compile Include="Sql.cs" />
     <Compile Include="StudentWindow.xaml.cs">
@@ -219,7 +211,9 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Export\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

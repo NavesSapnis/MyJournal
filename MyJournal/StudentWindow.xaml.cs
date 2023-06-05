@@ -1,5 +1,4 @@
-﻿using MyJournal.Class;
-using MyJournal.MarkHelper;
+﻿using MyJournal.MarkHelper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -42,7 +41,7 @@ namespace MyJournal
             for (int i = 0; i < subjects.Count; i++)
             {
                 var rowIndex = 0;
-                var grades = Sql.GetStudentSubjectGrades(Name, subjects[i]);
+                var grades = Sql.GetStudentSubjectGrades(Sql.GetStudentIdByName(Name),Sql.GetSubjectIdByName(subjects[i])); 
                 foreach (var grade in grades)
                 {
                     dataTable.Rows.Add();

@@ -19,6 +19,6 @@
         <ComboBox HorizontalAlignment="Left" Margin="414,41,0,0" VerticalAlignment="Top" Width="120" Height="21" Name="Subject" SelectionChanged="Subject_SelectionChanged"/>
         <Label Style="{StaticResource CustomLabelStyle}" Content="Группа" HorizontalAlignment="Left" Margin="268,10,0,0" VerticalAlignment="Top"/>
         <Label Style="{StaticResource CustomLabelStyle}" Content="Предмет" HorizontalAlignment="Left" Margin="439,10,0,0" VerticalAlignment="Top"/>
-        <Button Style="{StaticResource RoundedButtonStyle}" Content="Сохранить" HorizontalAlignment="Left" Margin="325,99,0,0" VerticalAlignment="Top" Click="SaveAction" Height="40" Width="100"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Обновить" HorizontalAlignment="Left" Margin="325,99,0,0" VerticalAlignment="Top" Click="Save" Height="40" Width="100"/>
     </Grid>
 </Window>

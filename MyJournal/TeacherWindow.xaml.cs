@@ -1,5 +1,4 @@
-﻿using MyJournal.Class;
-using MyJournal.MarkHelper;
+﻿using MyJournal.MarkHelper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -25,7 +24,7 @@ namespace MyJournal
     public partial class TeacherWindow : Window
     {
         //public new string Name = MainWindow.Name;
-        public new string Name = "Алексий В.О.";
+        public new string Name = "Иванов И.П.";
         public TeacherWindow()
         {
             InitializeComponent();
@@ -61,10 +60,11 @@ namespace MyJournal
         }
         public void LoadGroups()
         {
-            var groups = Sql.GetGroupsOfTeacher(Name);
+            var groups = Sql.GetGroupsOfTeacher(Sql.GetTeacherIdByName(Name));
             Group.DisplayMemberPath = "GroupName";
             Group.SelectedValuePath = "GroupId";
             Group.ItemsSource = groups.DefaultView;
+
         }
         public void LoadSubjects(int GroupId)
         {
@@ -83,13 +83,13 @@ namespace MyJournal
             for (int i = 0; i < students.Count; i++)
             {
                 int rowIndex = 0;
-                var grades = Sql.GetStudentSubjectGrades(students[i], Sql.GetSubjectNameById(Convert.ToInt32(Subject.SelectedValue)));
+                var grades = Sql.GetStudentSubjectGrades(Sql.GetStudentIdByName(students[i]), Convert.ToInt32(Subject.SelectedValue));
                 foreach (var grade in grades)
                 {
                     dataTable.Rows.Add();
                     dataTable.Rows[rowIndex].SetField(students[i], grade);
                     rowIndex++;
-                } 
+                }
             }
             Admin.RemoveEmptyRows(dataTable);
             data.ItemsSource = dataTable.DefaultView;
@@ -98,38 +98,40 @@ namespace MyJournal
         {
             LoadSubjects(Convert.ToInt32(Group.SelectedValue));
         }
-
         private void Subject_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             LoadStudentSubjectMarks(Sql.GetStudentsOfGroup(Convert.ToInt32(Group.SelectedValue)));
         }
-        public void Save()
+        public void Save(object sender, RoutedEventArgs e)
         {
-            int studentIndex = 0;
             var dataTable = GetDataTableFromDataGrid();
-            for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
+            foreach (DataColumn column in dataTable.Columns)
             {
-                string name = data.Columns[studentIndex].Header.ToString();
-                Sql.RemoveMarks(Sql.GetStudentIdByName(name), Convert.ToInt32(Subject.SelectedValue));
-                for (int columnIndex = 0; columnIndex < dataTable.Columns.Count; columnIndex++)
+                string name = column.ColumnName;
+                int studentId = Sql.GetStudentIdByName(name);
+                int subjectId = Convert.ToInt32(Subject.SelectedValue);
+                Sql.RemoveMarks(studentId, subjectId);
+                foreach (DataRow row in dataTable.Rows)
                 {
-                    object cellValue = dataTable.Rows[rowIndex][columnIndex];
+                    object cellValue = row[name];
                     try
                     {
-                        int grade = Convert.ToInt32(cellValue);
-                        Sql.AddMark(Sql.GetStudentIdByName(name), Convert.ToInt32(Subject.SelectedValue),grade);
+                        if (!string.IsNullOrEmpty(cellValue.ToString()))
+                        {
+                            int grade = Convert.ToInt32(cellValue);
+                            if (grade > 0 && grade < 11)
+                            {
+                                Sql.AddMark(studentId, subjectId, grade);
+                            }
+                            else
+                            {
+                                MessageBox.Show("Символы и оценки которые не входили в диапазон 0<x>11 удалены");
+                            }
+                        }
                     }
-                    catch
-                    {
-
-                    }
+                    catch { }
                 }
-                studentIndex++;
             }
-        }
-        private void SaveAction(object sender, RoutedEventArgs e)
-        {
-            Save();
         }
     }
 }
