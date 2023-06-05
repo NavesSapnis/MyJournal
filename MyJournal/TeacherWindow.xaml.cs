@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace MyJournal
 {
@@ -104,8 +105,27 @@ namespace MyJournal
         }
         public void Save()
         {
+            int studentIndex = 0;
             var dataTable = GetDataTableFromDataGrid();
-            int a = 0;
+            for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
+            {
+                string name = data.Columns[studentIndex].Header.ToString();
+                Sql.RemoveMarks(Sql.GetStudentIdByName(name), Convert.ToInt32(Subject.SelectedValue));
+                for (int columnIndex = 0; columnIndex < dataTable.Columns.Count; columnIndex++)
+                {
+                    object cellValue = dataTable.Rows[rowIndex][columnIndex];
+                    try
+                    {
+                        int grade = Convert.ToInt32(cellValue);
+                        Sql.AddMark(Sql.GetStudentIdByName(name), Convert.ToInt32(Subject.SelectedValue),grade);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+                studentIndex++;
+            }
         }
         private void SaveAction(object sender, RoutedEventArgs e)
         {

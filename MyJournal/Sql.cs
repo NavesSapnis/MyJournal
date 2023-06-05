@@ -19,7 +19,85 @@ namespace MyJournal
     {
         private Sql() { }
         public static string connectionString = "Data Source=mydatabase.db";
-        
+        public static int GetStudentIdByName(string studentName)
+        {
+            string query = "SELECT Id FROM Students WHERE Name = @StudentName";
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@StudentName", studentName);
+                int studentId = Convert.ToInt32(command.ExecuteScalar());
+                connection.Close();
+                return studentId;
+            }
+        }
+        public static int GetSubjectIdByName(string subjectName)
+        {
+            string query = "SELECT SubjectId FROM Subjects WHERE SubjectName = @SubjectName";
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@SubjectName", subjectName);
+                int subjectId = Convert.ToInt32(command.ExecuteScalar());
+                connection.Close();
+                return subjectId;
+            }
+        }
+        public static void RemoveMarks(int studentId, int subjectId)
+        {
+            string query = "DELETE FROM Marks WHERE StudentId = @StudentId AND SubjectId = @SubjectId";
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@StudentId", studentId);
+                command.Parameters.AddWithValue("@SubjectId", subjectId);
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+        public static void AddMark(int studentId, int subjectId, int grade)
+        {
+            string query = "INSERT INTO Marks (StudentId, SubjectId, Grade) VALUES (@StudentId, @SubjectId, @Grade)";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@StudentId", studentId);
+                    command.Parameters.AddWithValue("@SubjectId", subjectId);
+                    command.Parameters.AddWithValue("@Grade", grade);
+
+                    command.ExecuteNonQuery();
+                }
+
+                connection.Close();
+            }
+        }
+        public static void RemoveMark(int studentId, int subjectId, int grade)
+        {
+            string query = "DELETE FROM Marks WHERE StudentId = @StudentId AND SubjectId = @SubjectId AND Grade = @Grade";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@StudentId", studentId);
+                    command.Parameters.AddWithValue("@SubjectId", subjectId);
+                    command.Parameters.AddWithValue("@Grade", grade);
+
+                    command.ExecuteNonQuery();
+                }
+
+                connection.Close();
+            }
+        }
         public static void AddSubject(string SubjectName)
         {
             using (var connection = new SQLiteConnection(connectionString))
@@ -700,5 +778,6 @@ namespace MyJournal
             }
             return grades;
         }
+        
     }
 }
