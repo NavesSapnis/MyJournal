@@ -14,11 +14,16 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
-        <DataGrid CellStyle="{StaticResource {x:Type DataGridCell}}" Style="{StaticResource DataGridStyle}" d:ItemsSource="{d:SampleData ItemCount=5}" x:Name="data" AutoGenerateColumns="True" Margin="10,165,10,10" />
+        <DataGrid Style="{StaticResource DataGridStyle}" x:Name="data" AutoGenerateColumns="True" Margin="10,165,10,10" />
         <ComboBox HorizontalAlignment="Left" Margin="237,41,0,0" VerticalAlignment="Top" Width="120" Height="21" Name="Group" SelectionChanged="Group_SelectionChanged"/>
         <ComboBox HorizontalAlignment="Left" Margin="414,41,0,0" VerticalAlignment="Top" Width="120" Height="21" Name="Subject" SelectionChanged="Subject_SelectionChanged"/>
         <Label Style="{StaticResource CustomLabelStyle}" Content="Группа" HorizontalAlignment="Left" Margin="268,10,0,0" VerticalAlignment="Top"/>
         <Label Style="{StaticResource CustomLabelStyle}" Content="Предмет" HorizontalAlignment="Left" Margin="439,10,0,0" VerticalAlignment="Top"/>
-        <Button Style="{StaticResource RoundedButtonStyle}" Content="Обновить" HorizontalAlignment="Left" Margin="325,99,0,0" VerticalAlignment="Top" Click="Save" Height="40" Width="100"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Обновить" HorizontalAlignment="Left" Margin="389,99,0,0" VerticalAlignment="Top" Click="Refresh" Height="40" Width="100"/>
+        <Button Style="{StaticResource RoundedButtonStyle}" Content="Сохранить" HorizontalAlignment="Left" Margin="268,99,0,0" VerticalAlignment="Top" Click="Save" Height="40" Width="100"/>
+        <Button Name="GroupSkill" Content="Ведомость" HorizontalAlignment="Left" Margin="624,17,0,0" VerticalAlignment="Top" Width="151" Click="GroupSkill_Click"/>
+        <Button Name="MyGroupSkill" Content="Сводная ведомость" HorizontalAlignment="Left" Margin="624,42,0,0" VerticalAlignment="Top" Width="151" Click="MyGroupSkill_Click"/>
+        <Button Content="Успеваемость учащегося" HorizontalAlignment="Left" Margin="624,124,0,0" Click="StudentsSkill" VerticalAlignment="Top" Width="152"/>
+        <ComboBox Name="Student" HorizontalAlignment="Left" Margin="640,97,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Student_SelectionChanged"/>
     </Grid>
 </Window>

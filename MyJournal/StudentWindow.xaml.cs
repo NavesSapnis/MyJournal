@@ -23,6 +23,7 @@ namespace MyJournal
     public partial class StudentWindow : Window
     {
         public new string Name = MainWindow.Name;
+        //public new string Name = "Сидорова С.И.";
         public StudentWindow()
         {
             InitializeComponent();
@@ -49,12 +50,21 @@ namespace MyJournal
                     rowIndex++;
                 }
                 dataTable.Rows.Add();
-                dataTable.Rows[rowIndex].SetField(subjects[i], "Ср. балл: "+MarksHelper.GetAverage(grades.Sum(), grades.Count()));
-                
+                var srb = MarksHelper.GetAverage(grades.Sum(), grades.Count());
+                if (double.IsNaN(srb))
+                {
+                    dataTable.Rows[rowIndex].SetField(subjects[i], "не атест.");
+                }
+                else
+                {
+                    dataTable.Rows[rowIndex].SetField(subjects[i], "Ср. балл: " + srb);
+                }
+
             }
             Admin.RemoveEmptyRows(dataTable);
             data.ItemsSource = dataTable.DefaultView;
         }
+        
         public string Hello()
         {
             return $"Приветствуем, {Name}";

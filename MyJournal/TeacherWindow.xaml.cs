@@ -1,4 +1,5 @@
-﻿using MyJournal.MarkHelper;
+﻿using MyJournal.Export;
+using MyJournal.MarkHelper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -24,12 +25,13 @@ namespace MyJournal
     public partial class TeacherWindow : Window
     {
         //public new string Name = MainWindow.Name;
-        public new string Name = "Иванов И.П.";
+        public new string Name = "Иванов_И_П";
         public TeacherWindow()
         {
             InitializeComponent();
             ResizeMode = ResizeMode.NoResize;
             LoadGroups();
+            LoadStudentsComboBox();
         }
         public DataTable GetDataTableFromDataGrid()
         {
@@ -73,6 +75,13 @@ namespace MyJournal
             Subject.SelectedValuePath = "SubjectId";
             Subject.ItemsSource = subjectsOfThisGroup.DefaultView;
         }
+        public void LoadStudentsComboBox()
+        {
+            int groupId = Sql.GetTeacherGroupId(Sql.GetTeacherIdByName(Name));
+            var students = Sql.GetStudentsOfGroup(groupId);
+            Student.ItemsSource = students;
+            Student.SelectedIndex = 0;
+        }
         public void LoadStudentSubjectMarks(List<string> students)
         {
             DataTable dataTable = new DataTable();
@@ -87,7 +96,7 @@ namespace MyJournal
                 foreach (var grade in grades)
                 {
                     dataTable.Rows.Add();
-                    dataTable.Rows[rowIndex].SetField(students[i], grade);
+                    dataTable.Rows[rowIndex].SetField(students[i].ToString(), grade);
                     rowIndex++;
                 }
             }
@@ -132,6 +141,87 @@ namespace MyJournal
                     catch { }
                 }
             }
+        }
+
+        private void Refresh(object sender, RoutedEventArgs e)
+        {
+            LoadStudentSubjectMarks(Sql.GetStudentsOfGroup(Convert.ToInt32(Group.SelectedValue)));
+        }
+
+        private void StudentsSkill(object sender, RoutedEventArgs e)
+        {
+            var studentName = Student.SelectedItem.ToString();
+            if (!string.IsNullOrEmpty(studentName))
+            {
+                var table = LoadStudent(studentName);
+                DataTableToWordExporter.FileSave(studentName, table, "C:\\Users\\veih\\Source\\Repos\\NavesSapnis\\MyJournal\\MyJournal\\Exported\\exp1.docx");
+                MessageBox.Show("Эскпортированно");
+            }
+        }
+        public static DataTable LoadStudent(string Name)
+        {
+            var subjects = Sql.GetSubjectsForGroup(Sql.GetStudentGroup(Name));
+            DataTable dataTable = new DataTable();
+            for (int i = 0; i < subjects.Count; i++)
+            {
+                dataTable.Columns.Add(subjects[i].ToString());
+            }
+            for (int i = 0; i < subjects.Count; i++)
+            {
+                var rowIndex = 0;
+                var grades = Sql.GetStudentSubjectGrades(Sql.GetStudentIdByName(Name), Sql.GetSubjectIdByName(subjects[i]));
+                foreach (var grade in grades)
+                {
+                    dataTable.Rows.Add();
+                    dataTable.Rows[rowIndex].SetField(subjects[i], grade);
+                    rowIndex++;
+                }
+                dataTable.Rows.Add();
+                var srb = MarksHelper.GetAverage(grades.Sum(), grades.Count());
+                if (double.IsNaN(srb))
+                {
+                    dataTable.Rows[rowIndex].SetField(subjects[i], "не атест.");
+                }
+                else
+                {
+                    dataTable.Rows[rowIndex].SetField(subjects[i], "Ср. балл: " + srb);
+                }
+            }
+            Admin.RemoveEmptyRows(dataTable);
+            return dataTable;
+        }
+        private void Student_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void GroupSkill_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var table = GetDataTableFromDataGrid();
+                var group = Sql.GetGroupNameById(Convert.ToInt32(Group.SelectedValue));
+                var subject = Sql.GetSubjectNameById(Convert.ToInt32(Subject.SelectedValue)); var all = group + " " + subject;
+                DataTableToWordExporter.FileSave(all, table, "C:\\Users\\veih\\Source\\Repos\\NavesSapnis\\MyJournal\\MyJournal\\Exported\\exp2.docx");
+                MessageBox.Show("Эскпортированно");
+
+            }
+            catch { MessageBox.Show("Выберите группу и ее предмет"); }
+        }
+
+        private void MyGroupSkill_Click(object sender, RoutedEventArgs e)
+        {
+            List<DataTable> dataTables = new List<DataTable>();
+            var group = Sql.GetTeacherGroupId(Sql.GetTeacherIdByName(Name));
+            var groupName = Sql.GetGroupNameById(group);
+            var students = Sql.GetStudentsOfGroup(group);
+            foreach (var student in students)
+            {
+                var table = LoadStudent(student);
+                dataTables.Add(table);
+            }
+            DataTableToWordExporter.FileSave(groupName, students, dataTables, "C:\\Users\\veih\\Source\\Repos\\NavesSapnis\\MyJournal\\MyJournal\\Exported\\exp3.docx");
+            MessageBox.Show("Эскпортированно");
         }
     }
 }
