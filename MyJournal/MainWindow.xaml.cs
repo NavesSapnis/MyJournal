@@ -67,23 +67,22 @@ namespace MyJournal
         {
             Name = name.Text;
             Password = password.Text;
-            EnterTeacher();
-            //if (Sql.AdminValidation(Name, Password))
-            //{
-            //    EnterAdmin();
-            //}
-            //else if(Sql.LoginValidationTeacher(Name, Password) &&TeacherBox())
-            //{
-            //    //Учитель
-            //}
-            //else if (Sql.LoginValidationStudent(Name, Password))
-            //{
-            //    EnterStudent();
-            //}
-            //else
-            //{
-            //    error.Content = "Ошибка авторизации";
-            //}
+            if (Sql.AdminValidation(Name, Password))
+            {
+                EnterAdmin();
+            }
+            else if (Sql.LoginValidationTeacher(Name, Password) && TeacherBox())
+            {
+                EnterTeacher();
+            }
+            else if (Sql.LoginValidationStudent(Name, Password))
+            {
+                EnterStudent();
+            }
+            else
+            {
+                error.Content = "Ошибка авторизации";
+            }
         }
         public void RemoveText(object sender, EventArgs e)
         {
